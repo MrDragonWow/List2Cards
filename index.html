@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flashcards</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Hiragino Sans","Meiryo",sans-serif;background:#f4f6f8;color:#1d2329;min-height:100vh}
+#app{max-width:520px;margin:0 auto;padding:16px}
+.screen{display:none}.screen.active{display:block}
+h1{font-size:24px;font-weight:700;margin:10px 0 4px}h2{font-size:19px;font-weight:700;margin:8px 0 12px}
+.subtitle,.hint{font-size:13px;color:#647180;line-height:1.6}.hint{margin:6px 0 12px}
+.panel{background:#fff;border:1px solid #dfe5ea;border-radius:8px;padding:14px;margin:12px 0}
+.btn{display:block;width:100%;padding:12px 14px;border-radius:8px;border:1px solid #cbd3da;background:#fff;color:#1d2329;font-size:15px;cursor:pointer;text-align:center;margin:8px 0}
+.btn:disabled{opacity:.45;cursor:not-allowed}.btn.primary{background:#185fa5;border-color:#0c447c;color:#fff}.btn.success{background:#3b6d11;border-color:#27500a;color:#fff}.btn.danger{background:#a32d2d;border-color:#791f1f;color:#fff}.btn.ghost{text-align:left}
+.btn-row{display:flex;gap:8px}.btn-row .btn{margin:0}.btn.small{padding:8px 9px;font-size:13px}
+input[type="text"],input[type="url"],input[type="file"],select{width:100%;padding:11px;border:1px solid #cbd3da;border-radius:8px;background:#fff;font-size:15px}
+input[type="range"]{width:100%;accent-color:#185fa5}
+label.form-label{display:block;font-size:13px;font-weight:700;margin:12px 0 6px}
+.notice{display:none;border-radius:8px;padding:10px 12px;margin:10px 0;font-size:13px;line-height:1.5}.notice.show{display:block}.notice.error{background:#fcebeb;color:#8d2525;border:1px solid #f1b8b8}.notice.info{background:#eaf3fb;color:#194f7b;border:1px solid #b8d8ef}
+.meta{font-size:13px;line-height:1.7;color:#47535f}.meta strong{color:#1d2329}
+.range-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.count-row{display:grid;grid-template-columns:auto auto 1fr auto auto;gap:6px;align-items:center}.count-display{text-align:center;font-weight:700;font-size:16px}
+.choice-list{display:flex;flex-direction:column;gap:8px;margin:10px 0}.choice{display:grid;grid-template-columns:30px 1fr;gap:10px;align-items:center;padding:12px;border:1px solid #d7dee5;border-radius:8px;background:#fff;cursor:pointer}.choice.selected{border-color:#185fa5;background:#edf5fc}.choice-num{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;background:#e2e8ee;color:#55616d}.choice.selected .choice-num{background:#185fa5;color:#fff}
+.progress-wrap{background:#e0e6eb;border-radius:4px;height:6px;margin:10px 0 6px}.progress-bar{height:6px;border-radius:4px;background:#185fa5;transition:width .2s}.progress-text{font-size:12px;color:#647180;margin-bottom:14px}
+.card{background:#fff;border:1px solid #d7dee5;border-radius:12px;min-height:230px;padding:24px 18px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:10px;margin:14px 0;overflow-wrap:anywhere}
+.card-label{font-size:13px;color:#647180}.card-main{font-size:30px;font-weight:700;white-space:pre-wrap;line-height:1.35}.card-sub{font-size:13px;color:#7b8793}
+.stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0}.stat{background:#fff;border:1px solid #dfe5ea;border-radius:8px;padding:12px;text-align:center}.stat-label{font-size:12px;color:#647180}.stat-num{font-size:24px;font-weight:700}.ok{color:#3b6d11}.ng{color:#a32d2d}
+.result-item{display:grid;grid-template-columns:1fr auto;gap:10px;padding:10px 0;border-bottom:1px solid #e5eaee;font-size:13px}.result-main{font-weight:700}.result-sub{color:#647180;margin-top:3px;white-space:pre-wrap}.badge{border-radius:6px;padding:3px 9px;font-size:12px;align-self:start}.badge.ok{background:#eaf3de}.badge.ng{background:#fcebeb}
+#qr-img{display:block;max-width:220px;width:70%;margin:12px auto;border:1px solid #dfe5ea;border-radius:8px}
+.link-box{font-size:12px;word-break:break-all;color:#47535f;background:#f7f9fb;border:1px solid #dfe5ea;border-radius:8px;padding:9px}
+</style>
+</head>
+<body>
+<div id="app">
+  <section id="s-load" class="screen active">
+    <h1>Flashcards</h1>
+    <p class="subtitle">Create flashcards from Excel, CSV, or a spreadsheet link.</p>
+    <div id="load-notice" class="notice"></div>
+    <div class="panel">
+      <label class="form-label" for="file-input">File</label>
+      <input id="file-input" type="file" accept=".csv,.tsv,.txt,.xlsx,.xls">
+      <p class="hint">CSV works offline. Excel requires the import library to be available online.</p>
+      <button class="btn primary" id="file-load-btn">Load File</button>
+    </div>
+    <div class="panel">
+      <label class="form-label" for="sheet-url">Spreadsheet Link</label>
+      <input id="sheet-url" type="url" placeholder="https://docs.google.com/spreadsheets/d/...">
+      <p class="hint">The sheet must be readable as public CSV. First load requires network access.</p>
+      <button class="btn primary" id="sheet-load-btn">Load Link</button>
+    </div>
+    <div class="panel">
+      <p class="hint">Template: Row 1 headers / A:List / B:Author / C:Tags / D:No. / E+:Card fields</p>
+    </div>
+  </section>
+
+  <section id="s-setup" class="screen">
+    <h2>Practice Setup</h2>
+    <div class="panel meta" id="list-meta"></div>
+    <div id="setup-notice" class="notice"></div>
+    <div class="panel">
+      <label class="form-label">No. Range</label>
+      <div class="range-grid">
+        <input id="min-no" type="text" inputmode="numeric">
+        <input id="max-no" type="text" inputmode="numeric">
+      </div>
+      <label class="form-label">Order</label>
+      <select id="order-select">
+        <option value="number">No. order</option>
+        <option value="random">Random</option>
+      </select>
+      <label class="form-label">Cards</label>
+      <div class="count-row">
+        <button class="btn small" id="count-minus-5">-5</button>
+        <button class="btn small" id="count-minus-1">-1</button>
+        <input id="count-slider" type="range" min="1" max="1" value="1">
+        <button class="btn small" id="count-plus-1">+1</button>
+        <button class="btn small" id="count-plus-5">+5</button>
+      </div>
+      <div class="count-display"><span id="count-num">1</span> cards</div>
+    </div>
+    <div class="panel">
+      <h2>Fields</h2>
+      <p class="hint">Select 2 or more. Tap order becomes display order.</p>
+      <div class="choice-list" id="field-list"></div>
+    </div>
+    <button class="btn primary" id="start-btn">Start ▶</button>
+    <button class="btn" id="share-btn">Share URL / QR</button>
+    <button class="btn" onclick="goTo('s-load')">Load another list</button>
+  </section>
+
+  <section id="s-share" class="screen">
+    <h2>Share URL / QR</h2>
+    <div class="panel">
+      <p class="hint">When loaded from a spreadsheet link, this URL shares the same practice settings.</p>
+      <img id="qr-img" alt="QR code">
+      <div class="link-box" id="share-url"></div>
+    </div>
+    <button class="btn" onclick="goTo('s-setup')">← Back</button>
+  </section>
+
+  <section id="s-study" class="screen">
+    <div style="text-align:right"><button class="btn small" style="display:inline-block;width:auto" onclick="goTo('s-setup')">Exit</button></div>
+    <div class="progress-wrap"><div class="progress-bar" id="prog-bar"></div></div>
+    <p class="progress-text" id="prog-text"></p>
+    <div class="card">
+      <p class="card-label" id="card-label"></p>
+      <p class="card-main" id="card-main"></p>
+      <p class="card-sub" id="card-sub"></p>
+    </div>
+    <div id="answer-actions">
+      <button class="btn primary" id="answer-btn">Answer ▶</button>
+    </div>
+    <div id="judge-actions" style="display:none">
+      <div class="btn-row">
+        <button class="btn success" id="ok-btn">OK ✓</button>
+        <button class="btn danger" id="ng-btn">Again ✗</button>
+      </div>
+    </div>
+    <div id="skip-actions" style="display:none">
+      <button class="btn primary" id="skip-btn">Next →</button>
+    </div>
+  </section>
+
+  <section id="s-result" class="screen">
+    <h2>Complete</h2>
+    <div class="stat-row" id="result-stats"></div>
+    <div class="panel" id="field-stats"></div>
+    <div id="result-list"></div>
+    <div class="btn-row" style="margin-top:14px">
+      <button class="btn danger" id="retry-btn">Review ✗</button>
+      <button class="btn" onclick="goTo('s-setup')">Setup</button>
+    </div>
+  </section>
+</div>
+
+<script>
+const MAX_ITEMS = 1000;
+const NONE_TEXT = "(None)";
+let dataset = null;
+let selectedFields = [];
+let selectedCount = 1;
+let studyQueue = [];
+let currentCardIndex = 0;
+let currentAnswerIndex = -1;
+let showingAnswer = false;
+let results = [];
+let sourceUrl = "";
+
+const $ = id => document.getElementById(id);
+
+function goTo(id){
+  document.querySelectorAll(".screen").forEach(screen => screen.classList.remove("active"));
+  $(id).classList.add("active");
+}
+
+function setNotice(id, message, type="error"){
+  const el = $(id);
+  el.textContent = message || "";
+  el.className = "notice " + type + (message ? " show" : "");
+}
+
+function shuffle(items){
+  const copy = items.slice();
+  for(let i=copy.length-1;i>0;i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
+}
+
+function parseCsv(text){
+  const rows = [];
+  let row = [], cell = "", quoted = false;
+  const src = text.replace(/^\uFEFF/, "");
+  for(let i=0;i<src.length;i++){
+    const ch = src[i], next = src[i+1];
+    if(quoted){
+      if(ch === '"' && next === '"'){ cell += '"'; i++; }
+      else if(ch === '"'){ quoted = false; }
+      else { cell += ch; }
+    }else{
+      if(ch === '"') quoted = true;
+      else if(ch === "," || ch === "\t"){ row.push(cell); cell = ""; }
+      else if(ch === "\n"){ row.push(cell); rows.push(row); row = []; cell = ""; }
+      else if(ch !== "\r"){ cell += ch; }
+    }
+  }
+  row.push(cell);
+  rows.push(row);
+  return rows.filter(r => r.some(c => String(c).trim() !== ""));
+}
+
+function normalizeRows(rows){
+  if(rows.length < 2) throw new Error("Row 1 headers and at least one data row are required.");
+  const header = rows[0].map(c => String(c || "").trim());
+  if(header.length < 6) throw new Error("Columns A-D and at least two card fields from column E are required.");
+  if(!header[0] || !header[1] || !header[2]) throw new Error("Columns A-C need headers for List, Author, and Tags.");
+  if(!header[3]) throw new Error("Column D needs a No. header.");
+  const fieldNames = header.slice(4).map(c => String(c || "").trim()).filter(Boolean);
+  if(fieldNames.length < 2) throw new Error("Add at least two headers from column E onward.");
+
+  const firstData = rows.find((r, idx) => idx > 0 && r.some(c => String(c || "").trim() !== ""));
+  const listName = String((firstData && firstData[0]) || rows[1][0] || "Untitled").trim() || "Untitled";
+  const author = String((firstData && firstData[1]) || rows[1][1] || "").trim();
+  const tags = String((firstData && firstData[2]) || rows[1][2] || "")
+    .split(/[,、]/).map(t => t.trim()).filter(Boolean);
+  const seen = new Set();
+  const items = [];
+
+  rows.slice(1).forEach((r, idx) => {
+    if(!r.some(c => String(c || "").trim() !== "")) return;
+    const number = Number(String(r[3] || "").trim());
+    if(!Number.isFinite(number)) throw new Error(`Row ${idx + 2}: column D No. must be numeric.`);
+    if(seen.has(number)) throw new Error(`Column D No. ${number} is duplicated.`);
+    seen.add(number);
+    const fields = {};
+    fieldNames.forEach((name, fieldIdx) => {
+      fields[name] = String(r[fieldIdx + 4] || "").trim();
+    });
+    items.push({ number, fields });
+  });
+
+  if(items.length === 0) throw new Error("No valid card data found.");
+  items.sort((a,b) => a.number - b.number);
+  if(items.length > MAX_ITEMS) {
+    items.length = MAX_ITEMS;
+    setNotice("setup-notice", "More than 1000 items found. Only the first 1000 were loaded.", "info");
+  }
+  return { listName, author, tags, fieldNames, items };
+}
+
+async function loadExcel(file){
+  if(!window.XLSX){
+    await new Promise((resolve, reject) => {
+      const script = document.createElement("script");
+      script.src = "https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js";
+      script.onload = resolve;
+      script.onerror = () => reject(new Error("Could not load the Excel import library. Save as CSV and try again."));
+      document.head.appendChild(script);
+    });
+  }
+  const buffer = await file.arrayBuffer();
+  const workbook = XLSX.read(buffer, { type: "array" });
+  const sheet = workbook.Sheets[workbook.SheetNames[0]];
+  return XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "" });
+}
+
+function googleSheetCsvUrl(url){
+  const match = url.match(/\/spreadsheets\/d\/([^/]+)/);
+  if(!match) return url;
+  const gidMatch = url.match(/[?&#]gid=(\d+)/);
+  const gid = gidMatch ? gidMatch[1] : "0";
+  return `https://docs.google.com/spreadsheets/d/${match[1]}/export?format=csv&gid=${gid}`;
+}
+
+async function loadDatasetFromRows(rows, src=""){
+  dataset = normalizeRows(rows);
+  sourceUrl = src;
+  selectedFields = restoreFieldSelection();
+  selectedCount = Math.min(15, dataset.items.length);
+  renderSetup();
+  applyQuerySettings();
+  goTo("s-setup");
+}
+
+function datasetKey(){
+  if(!dataset) return "";
+  return "flashcards:fields:" + [dataset.listName, dataset.author, dataset.tags.join(","), dataset.fieldNames.join("|")].join("::");
+}
+
+function restoreFieldSelection(){
+  try{
+    const saved = JSON.parse(localStorage.getItem(datasetKey()) || "[]");
+    const valid = saved.filter(name => dataset.fieldNames.includes(name));
+    if(valid.length >= 2) return valid;
+  }catch(e){}
+  return dataset.fieldNames.slice(0, Math.min(2, dataset.fieldNames.length));
+}
+
+function saveFieldSelection(){
+  try{ localStorage.setItem(datasetKey(), JSON.stringify(selectedFields)); }catch(e){}
+}
+
+function renderSetup(){
+  $("list-meta").textContent = "";
+  const lines = [
+    `List: ${dataset.listName}`,
+    `Author: ${dataset.author || "-"}`,
+    `Tags: ${dataset.tags.join(", ") || "-"}`,
+    `Items: ${dataset.items.length}`,
+    `Fields: ${dataset.fieldNames.join(" / ")}`
+  ];
+  lines.forEach(line => {
+    const div = document.createElement("div");
+    div.textContent = line;
+    $("list-meta").appendChild(div);
+  });
+
+  $("min-no").value = dataset.items[0].number;
+  $("max-no").value = dataset.items[dataset.items.length - 1].number;
+  $("count-slider").max = dataset.items.length;
+  setCount(selectedCount);
+  renderFieldList();
+}
+
+function renderFieldList(){
+  const list = $("field-list");
+  list.textContent = "";
+  dataset.fieldNames.forEach(name => {
+    const div = document.createElement("div");
+    const idx = selectedFields.indexOf(name);
+    div.className = "choice" + (idx >= 0 ? " selected" : "");
+    const num = document.createElement("div");
+    num.className = "choice-num";
+    num.textContent = idx >= 0 ? String(idx + 1) : "";
+    const label = document.createElement("div");
+    label.textContent = name;
+    div.append(num, label);
+    div.onclick = () => toggleField(name);
+    list.appendChild(div);
+  });
+}
+
+function toggleField(name){
+  const idx = selectedFields.indexOf(name);
+  if(idx >= 0) selectedFields.splice(idx, 1);
+  else selectedFields.push(name);
+  saveFieldSelection();
+  renderFieldList();
+}
+
+function setCount(value){
+  const max = Math.max(1, filteredItems().length);
+  selectedCount = Math.max(1, Math.min(max, Number(value) || 1));
+  $("count-slider").max = max;
+  $("count-slider").value = selectedCount;
+  $("count-num").textContent = selectedCount;
+}
+
+function filteredItems(){
+  if(!dataset) return [];
+  const min = Number($("min-no").value);
+  const max = Number($("max-no").value);
+  return dataset.items.filter(item => item.number >= min && item.number <= max);
+}
+
+function makeStudyItems(){
+  let items = filteredItems();
+  if($("order-select").value === "random") items = shuffle(items);
+  return items.slice(0, selectedCount);
+}
+
+function startStudy(){
+  setNotice("setup-notice", "");
+  if(selectedFields.length < 2){
+    setNotice("setup-notice", "Select at least 2 fields.");
+    return;
+  }
+  const items = makeStudyItems();
+  if(!items.length){
+    setNotice("setup-notice", "No cards found in this No. range.");
+    return;
+  }
+  studyQueue = [];
+  const baseField = selectedFields[0];
+  const targetFields = selectedFields.slice(1);
+  items.forEach(item => {
+    const targets = targetFields.map(field => {
+      const answer = item.fields[field] || "";
+      return { field, answer, active: Boolean(answer) };
+    });
+    studyQueue.push({ item, baseField, targets });
+  });
+  if(!studyQueue.some(card => card.targets.some(target => target.active))){
+    setNotice("setup-notice", "No answer data found in the selected fields.");
+    return;
+  }
+  results = [];
+  currentCardIndex = 0;
+  currentAnswerIndex = -1;
+  showingAnswer = false;
+  showBaseCard();
+  goTo("s-study");
+}
+
+function totalActiveTasks(){
+  return studyQueue.reduce((sum, card) => sum + card.targets.filter(t => t.active).length, 0);
+}
+
+function completedTaskCount(){
+  return results.length;
+}
+
+function currentCard(){
+  return studyQueue[currentCardIndex];
+}
+
+function showBaseCard(){
+  const card = currentCard();
+  const pct = Math.round((completedTaskCount() / totalActiveTasks()) * 100);
+  $("prog-bar").style.width = pct + "%";
+  $("prog-text").textContent = `Card ${currentCardIndex + 1} / ${studyQueue.length}  No.${card.item.number}`;
+  $("card-label").textContent = card.baseField;
+  $("card-main").textContent = card.item.fields[card.baseField] || NONE_TEXT;
+  $("card-sub").textContent = "Base";
+  $("answer-actions").style.display = "block";
+  $("judge-actions").style.display = "none";
+  $("skip-actions").style.display = "none";
+  currentAnswerIndex = -1;
+  showingAnswer = false;
+}
+
+function showAnswer(){
+  const card = currentCard();
+  currentAnswerIndex++;
+  if(currentAnswerIndex >= card.targets.length){
+    advanceCard();
+    return;
+  }
+  const target = card.targets[currentAnswerIndex];
+  $("card-label").textContent = `Answer ${currentAnswerIndex + 1}: ${target.field}`;
+  $("card-main").textContent = target.answer || NONE_TEXT;
+  $("card-sub").textContent = `${card.baseField}: ${card.item.fields[card.baseField] || NONE_TEXT}`;
+  $("answer-actions").style.display = "none";
+  $("judge-actions").style.display = target.active ? "block" : "none";
+  $("skip-actions").style.display = target.active ? "none" : "block";
+  showingAnswer = true;
+}
+
+function judge(ok){
+  const card = currentCard();
+  const target = card.targets[currentAnswerIndex];
+  results.push({ item: card.item, baseField: card.baseField, field: target.field, answer: target.answer, active: true, ok });
+  nextAnswerOrCard();
+}
+
+function skipTask(){
+  nextAnswerOrCard();
+}
+
+function nextAnswerOrCard(){
+  const card = currentCard();
+  if(currentAnswerIndex + 1 < card.targets.length) showAnswer();
+  else advanceCard();
+}
+
+function advanceCard(){
+  currentCardIndex++;
+  if(currentCardIndex >= studyQueue.length) showResult();
+  else showBaseCard();
+}
+
+function showResult(){
+  $("prog-bar").style.width = "100%";
+  const ok = results.filter(r => r.ok).length;
+  const ng = results.length - ok;
+  const rate = results.length ? Math.round(ok / results.length * 100) : 0;
+  $("result-stats").textContent = "";
+  [
+    ["OK ✓", ok, "ok"],
+    ["Again ✗", ng, "ng"],
+    ["Score", rate + "%", ""]
+  ].forEach(([label, num, cls]) => {
+    const stat = document.createElement("div");
+    stat.className = "stat";
+    const l = document.createElement("div");
+    l.className = "stat-label";
+    l.textContent = label;
+    const n = document.createElement("div");
+    n.className = "stat-num " + cls;
+    n.textContent = num;
+    stat.append(l, n);
+    $("result-stats").appendChild(stat);
+  });
+
+  renderFieldStats();
+  renderResultList(results);
+  $("retry-btn").disabled = !ng;
+  goTo("s-result");
+}
+
+function renderFieldStats(){
+  const box = $("field-stats");
+  box.textContent = "";
+  selectedFields.slice(1).forEach(field => {
+    const fieldResults = results.filter(r => r.field === field);
+    const ok = fieldResults.filter(r => r.ok).length;
+    const pct = fieldResults.length ? Math.round(ok / fieldResults.length * 100) : 0;
+    const div = document.createElement("div");
+    div.className = "meta";
+    div.textContent = `${field}: ${pct}% (${ok}/${fieldResults.length})`;
+    box.appendChild(div);
+  });
+}
+
+function renderResultList(list){
+  const wrap = $("result-list");
+  wrap.textContent = "";
+  list.forEach(r => {
+    const row = document.createElement("div");
+    row.className = "result-item";
+    const left = document.createElement("div");
+    const main = document.createElement("div");
+    main.className = "result-main";
+    main.textContent = `No.${r.item.number} ${r.item.fields[r.baseField] || NONE_TEXT} → ${r.field}`;
+    const sub = document.createElement("div");
+    sub.className = "result-sub";
+    sub.textContent = r.answer || NONE_TEXT;
+    left.append(main, sub);
+    const badge = document.createElement("div");
+    badge.className = "badge " + (r.ok ? "ok" : "ng");
+    badge.textContent = r.ok ? "○" : "✗";
+    row.append(left, badge);
+    wrap.appendChild(row);
+  });
+}
+
+function retryWrong(){
+  studyQueue = results.filter(r => !r.ok).map(r => ({
+    item: r.item,
+    baseField: r.baseField,
+    targets: [{ field: r.field, answer: r.answer, active: true }]
+  }));
+  results = [];
+  currentCardIndex = 0;
+  currentAnswerIndex = -1;
+  if(studyQueue.length){
+    showBaseCard();
+    goTo("s-study");
+  }
+}
+
+function buildShareUrl(){
+  if(!sourceUrl) return "";
+  const params = new URLSearchParams();
+  params.set("src", sourceUrl);
+  params.set("fields", selectedFields.join("|"));
+  params.set("min", $("min-no").value);
+  params.set("max", $("max-no").value);
+  params.set("count", String(selectedCount));
+  params.set("order", $("order-select").value);
+  return location.origin + location.pathname + "?" + params.toString();
+}
+
+function showShare(){
+  const url = buildShareUrl();
+  if(!url){
+    setNotice("setup-notice", "Share URL is available when loaded from a spreadsheet link.");
+    goTo("s-setup");
+    return;
+  }
+  $("share-url").textContent = url;
+  $("qr-img").src = "https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=" + encodeURIComponent(url);
+  goTo("s-share");
+}
+
+function applyQuerySettings(){
+  const params = new URLSearchParams(location.search);
+  const fields = (params.get("fields") || "").split("|").filter(Boolean).filter(f => dataset.fieldNames.includes(f));
+  if(fields.length >= 2){
+    selectedFields = fields;
+    saveFieldSelection();
+    renderFieldList();
+  }
+  if(params.get("min")) $("min-no").value = params.get("min");
+  if(params.get("max")) $("max-no").value = params.get("max");
+  if(params.get("order")) $("order-select").value = params.get("order");
+  if(params.get("count")) setCount(params.get("count"));
+}
+
+async function initFromQuery(){
+  const params = new URLSearchParams(location.search);
+  const src = params.get("src");
+  if(!src) return;
+  $("sheet-url").value = src;
+  try{
+    setNotice("load-notice", "Loading from shared settings URL.", "info");
+    await loadFromSheetUrl(src);
+    setNotice("load-notice", "");
+  }catch(err){
+    setNotice("load-notice", err.message || "Load failed.");
+  }
+}
+
+async function loadFromSheetUrl(url){
+  const csvUrl = googleSheetCsvUrl(url);
+  const res = await fetch(csvUrl);
+  if(!res.ok) throw new Error("Could not load the spreadsheet. Check sharing settings.");
+  const text = await res.text();
+  await loadDatasetFromRows(parseCsv(text), url);
+}
+
+$("file-load-btn").onclick = async () => {
+  setNotice("load-notice", "");
+  const file = $("file-input").files[0];
+  if(!file){ setNotice("load-notice", "Choose a file."); return; }
+  try{
+    let rows;
+    if(/\.(xlsx|xls)$/i.test(file.name)){
+      rows = await loadExcel(file);
+    }else{
+      rows = parseCsv(await file.text());
+    }
+    sourceUrl = "";
+    await loadDatasetFromRows(rows, "");
+  }catch(err){
+    setNotice("load-notice", err.message || "Load failed.");
+  }
+};
+
+$("sheet-load-btn").onclick = async () => {
+  setNotice("load-notice", "");
+  const url = $("sheet-url").value.trim();
+  if(!url){ setNotice("load-notice", "Enter a spreadsheet share link."); return; }
+  try{ await loadFromSheetUrl(url); }
+  catch(err){ setNotice("load-notice", err.message || "Load failed."); }
+};
+
+$("count-slider").oninput = e => setCount(e.target.value);
+$("count-minus-5").onclick = () => setCount(selectedCount - 5);
+$("count-minus-1").onclick = () => setCount(selectedCount - 1);
+$("count-plus-1").onclick = () => setCount(selectedCount + 1);
+$("count-plus-5").onclick = () => setCount(selectedCount + 5);
+$("min-no").onchange = () => setCount(selectedCount);
+$("max-no").onchange = () => setCount(selectedCount);
+$("start-btn").onclick = startStudy;
+$("share-btn").onclick = showShare;
+$("answer-btn").onclick = showAnswer;
+$("ok-btn").onclick = () => judge(true);
+$("ng-btn").onclick = () => judge(false);
+$("skip-btn").onclick = skipTask;
+$("retry-btn").onclick = retryWrong;
+
+initFromQuery();
+</script>
+</body>
+</html>
