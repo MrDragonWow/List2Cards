@@ -254,6 +254,69 @@ function googleSheetCsvUrl(url){
   return `https://docs.google.com/spreadsheets/d/${match[1]}/export?format=csv&gid=${gid}`;
 }
 
+function googleVizUrl(url, callbackName){
+  const publishedMatch = url.match(/\/spreadsheets\/d\/e\/([^/]+)/);
+  const normalMatch = url.match(/\/spreadsheets\/d\/([^/]+)/);
+  const id = publishedMatch ? publishedMatch[1] : (normalMatch ? normalMatch[1] : "");
+  if(!id) return "";
+  const base = publishedMatch
+    ? `https://docs.google.com/spreadsheets/d/e/${id}/gviz/tq`
+    : `https://docs.google.com/spreadsheets/d/${id}/gviz/tq`;
+  const gidMatch = url.match(/[?&#]gid=(\d+)/);
+  const params = new URLSearchParams();
+  params.set("tqx", `responseHandler:${callbackName}`);
+  params.set("headers", "1");
+  if(gidMatch) params.set("gid", gidMatch[1]);
+  return `${base}?${params.toString()}`;
+}
+
+function loadGoogleSheetViaJsonp(url){
+  return new Promise((resolve, reject) => {
+    const callbackName = "__flashcardsSheet" + Date.now() + Math.floor(Math.random() * 100000);
+    const src = googleVizUrl(url, callbackName);
+    if(!src){
+      reject(new Error("This is not a supported Google Sheets URL."));
+      return;
+    }
+    const script = document.createElement("script");
+    const cleanup = () => {
+      delete window[callbackName];
+      script.remove();
+    };
+    const timer = setTimeout(() => {
+      cleanup();
+      reject(new Error("Spreadsheet load timed out."));
+    }, 12000);
+
+    window[callbackName] = response => {
+      clearTimeout(timer);
+      cleanup();
+      if(!response || response.status === "error"){
+        reject(new Error("Could not read the spreadsheet. Check publishing and sharing settings."));
+        return;
+      }
+      const table = response.table || {};
+      const header = (table.cols || []).map(col => String(col.label || col.id || "").trim());
+      const rows = [header];
+      (table.rows || []).forEach(row => {
+        rows.push(header.map((_, idx) => {
+          const cell = row.c && row.c[idx];
+          return cell && cell.v != null ? String(cell.v) : "";
+        }));
+      });
+      resolve(rows);
+    };
+
+    script.onerror = () => {
+      clearTimeout(timer);
+      cleanup();
+      reject(new Error("Could not load the spreadsheet script."));
+    };
+    script.src = src;
+    document.head.appendChild(script);
+  });
+}
+
 async function loadDatasetFromRows(rows, src=""){
   dataset = normalizeRows(rows);
   sourceUrl = src;
@@ -585,10 +648,16 @@ async function initFromQuery(){
 
 async function loadFromSheetUrl(url){
   const csvUrl = googleSheetCsvUrl(url);
-  const res = await fetch(csvUrl);
-  if(!res.ok) throw new Error("Could not load the spreadsheet. Check sharing settings.");
-  const text = await res.text();
-  await loadDatasetFromRows(parseCsv(text), url);
+  try{
+    const res = await fetch(csvUrl);
+    if(!res.ok) throw new Error("Could not load the spreadsheet. Check sharing settings.");
+    const text = await res.text();
+    await loadDatasetFromRows(parseCsv(text), url);
+  }catch(fetchError){
+    if(!/docs\.google\.com\/spreadsheets/.test(url)) throw fetchError;
+    const rows = await loadGoogleSheetViaJsonp(url);
+    await loadDatasetFromRows(rows, url);
+  }
 }
 
 $("file-load-btn").onclick = async () => {
