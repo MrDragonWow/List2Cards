@@ -58,7 +58,11 @@ label.form-label{display:block;font-size:13px;font-weight:700;margin:12px 0 6px}
     <h2>Practice Setup</h2>
     <div class="panel meta" id="list-meta"></div>
     <div id="source-actions" style="display:none">
-      <button class="btn" id="open-source-btn">Open Source CSV ↗</button>
+      <div class="panel">
+        <label class="form-label">Shared List Link</label>
+        <div class="link-box" id="source-url-box"></div>
+        <button class="btn" id="open-source-btn">Open Link ↗</button>
+      </div>
     </div>
     <div id="setup-notice" class="notice"></div>
     <div class="panel">
@@ -98,7 +102,7 @@ label.form-label{display:block;font-size:13px;font-weight:700;margin:12px 0 6px}
       <p class="hint">When loaded from a spreadsheet link, this URL shares the same practice settings.</p>
       <img id="qr-img" alt="QR code">
       <div class="link-box" id="share-url"></div>
-      <button class="btn" id="share-source-btn">Open Source CSV ↗</button>
+      <button class="btn" id="share-source-btn">Open Link ↗</button>
     </div>
     <button class="btn" onclick="goTo('s-setup')">← Back</button>
   </section>
@@ -130,6 +134,13 @@ label.form-label{display:block;font-size:13px;font-weight:700;margin:12px 0 6px}
     <h2>Complete</h2>
     <div class="stat-row" id="result-stats"></div>
     <div class="panel" id="field-stats"></div>
+    <div id="result-source-actions" style="display:none">
+      <div class="panel">
+        <label class="form-label">Shared List Link</label>
+        <div class="link-box" id="result-source-url-box"></div>
+        <button class="btn" id="result-open-source-btn">Open Link ↗</button>
+      </div>
+    </div>
     <div id="result-list"></div>
     <div class="btn-row" style="margin-top:14px">
       <button class="btn danger" id="retry-btn">Review ✗</button>
@@ -259,12 +270,6 @@ function googleSheetCsvUrl(url){
   return `https://docs.google.com/spreadsheets/d/${match[1]}/export?format=csv&gid=${gid}`;
 }
 
-function sourceDownloadUrl(url){
-  if(!url) return "";
-  if(/docs\.google\.com\/spreadsheets/.test(url)) return googleSheetCsvUrl(url);
-  return url;
-}
-
 function googleVizUrl(url, callbackName){
   if(/\/spreadsheets\/d\/e\//.test(url)) return "";
   const normalMatch = url.match(/\/spreadsheets\/d\/([^/]+)/);
@@ -369,7 +374,7 @@ function renderSetup(){
     $("list-meta").appendChild(div);
   });
 
-  $("source-actions").style.display = sourceUrl ? "block" : "none";
+  renderSourceLink("source-actions", "source-url-box");
   $("min-no").value = dataset.items[0].number;
   $("max-no").value = dataset.items[dataset.items.length - 1].number;
   $("count-slider").max = dataset.items.length;
@@ -548,6 +553,7 @@ function showResult(){
   });
 
   renderFieldStats();
+  renderSourceLink("result-source-actions", "result-source-url-box");
   renderResultList(results);
   $("retry-btn").disabled = !ng;
   goTo("s-result");
@@ -630,9 +636,20 @@ function showShare(){
 }
 
 function openSourceCsv(){
-  const url = sourceDownloadUrl(sourceUrl);
-  if(!url) return;
-  window.open(url, "_blank", "noopener,noreferrer");
+  if(!sourceUrl) return;
+  window.open(sourceUrl, "_blank", "noopener,noreferrer");
+}
+
+function renderSourceLink(containerId, boxId){
+  const container = $(containerId);
+  const box = $(boxId);
+  if(!sourceUrl){
+    container.style.display = "none";
+    box.textContent = "";
+    return;
+  }
+  container.style.display = "block";
+  box.textContent = sourceUrl;
 }
 
 function applyQuerySettings(){
@@ -721,6 +738,7 @@ $("start-btn").onclick = startStudy;
 $("share-btn").onclick = showShare;
 $("open-source-btn").onclick = openSourceCsv;
 $("share-source-btn").onclick = openSourceCsv;
+$("result-open-source-btn").onclick = openSourceCsv;
 $("answer-btn").onclick = showAnswer;
 $("ok-btn").onclick = () => judge(true);
 $("ng-btn").onclick = () => judge(false);
