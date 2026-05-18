@@ -25,6 +25,7 @@ label.form-label{display:block;font-size:13px;font-weight:700;margin:12px 0 6px}
 .progress-wrap{background:#e0e6eb;border-radius:4px;height:6px;margin:10px 0 6px}.progress-bar{height:6px;border-radius:4px;background:#185fa5;transition:width .2s}.progress-text{font-size:12px;color:#647180;margin-bottom:14px}
 .card{background:#fff;border:1px solid #d7dee5;border-radius:12px;min-height:230px;padding:24px 18px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:10px;margin:14px 0;overflow-wrap:anywhere}
 .card-label{font-size:13px;color:#647180}.card-main{font-size:30px;font-weight:700;white-space:pre-wrap;line-height:1.35}.card-sub{font-size:13px;color:#7b8793}
+.next-field{font-size:13px;color:#185fa5;font-weight:700}
 .stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0}.stat{background:#fff;border:1px solid #dfe5ea;border-radius:8px;padding:12px;text-align:center}.stat-label{font-size:12px;color:#647180}.stat-num{font-size:24px;font-weight:700}.ok{color:#3b6d11}.ng{color:#a32d2d}
 .result-item{display:grid;grid-template-columns:1fr auto;gap:10px;padding:10px 0;border-bottom:1px solid #e5eaee;font-size:13px}.result-main{font-weight:700}.result-sub{color:#647180;margin-top:3px;white-space:pre-wrap}.badge{border-radius:6px;padding:3px 9px;font-size:12px;align-self:start}.badge.ok{background:#eaf3de}.badge.ng{background:#fcebeb}
 #qr-img{display:block;max-width:220px;width:70%;margin:12px auto;border:1px solid #dfe5ea;border-radius:8px}
@@ -119,6 +120,7 @@ label.form-label{display:block;font-size:13px;font-weight:700;margin:12px 0 6px}
       <p class="card-label" id="card-label"></p>
       <p class="card-main" id="card-main"></p>
       <p class="card-sub" id="card-sub"></p>
+      <p class="next-field" id="next-field"></p>
     </div>
     <div id="answer-actions">
       <button class="btn primary" id="answer-btn">Answer ▶</button>
@@ -534,6 +536,7 @@ function showBaseCard(){
   $("card-label").textContent = card.baseField;
   $("card-main").textContent = card.item.fields[card.baseField] || NONE_TEXT;
   $("card-sub").textContent = "Base";
+  $("next-field").textContent = card.targets.length ? `Next → ${card.targets[0].field}` : "";
   $("answer-actions").style.display = "block";
   $("judge-actions").style.display = "none";
   $("skip-actions").style.display = "none";
@@ -549,9 +552,11 @@ function showAnswer(){
     return;
   }
   const target = card.targets[currentAnswerIndex];
+  const nextTarget = card.targets[currentAnswerIndex + 1];
   $("card-label").textContent = `Answer ${currentAnswerIndex + 1}: ${target.field}`;
   $("card-main").textContent = target.answer || NONE_TEXT;
   $("card-sub").textContent = `${card.baseField}: ${card.item.fields[card.baseField] || NONE_TEXT}`;
+  $("next-field").textContent = nextTarget ? `Next → ${nextTarget.field}` : "";
   $("answer-actions").style.display = "none";
   $("judge-actions").style.display = target.active ? "block" : "none";
   $("skip-actions").style.display = target.active ? "none" : "block";
