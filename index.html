@@ -20,7 +20,7 @@ input[type="range"]{width:100%;accent-color:#185fa5}
 label.form-label{display:block;font-size:13px;font-weight:700;margin:12px 0 6px}
 .notice{display:none;border-radius:8px;padding:10px 12px;margin:10px 0;font-size:13px;line-height:1.5}.notice.show{display:block}.notice.error{background:#fcebeb;color:#8d2525;border:1px solid #f1b8b8}.notice.info{background:#eaf3fb;color:#194f7b;border:1px solid #b8d8ef}
 .meta{font-size:13px;line-height:1.7;color:#47535f}.meta strong{color:#1d2329}
-.range-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.count-row{display:grid;grid-template-columns:auto auto 1fr auto auto;gap:6px;align-items:center}.count-display{text-align:center;font-weight:700;font-size:16px}
+.range-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.range-sliders{display:grid;grid-template-columns:1fr;gap:8px;margin-top:10px}.count-row{display:grid;grid-template-columns:auto auto 1fr auto auto;gap:6px;align-items:center}.count-display{text-align:center;font-weight:700;font-size:16px}
 .choice-list{display:flex;flex-direction:column;gap:8px;margin:10px 0}.choice{display:grid;grid-template-columns:30px 1fr;gap:10px;align-items:center;padding:12px;border:1px solid #d7dee5;border-radius:8px;background:#fff;cursor:pointer}.choice.selected{border-color:#185fa5;background:#edf5fc}.choice-num{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;background:#e2e8ee;color:#55616d}.choice.selected .choice-num{background:#185fa5;color:#fff}
 .progress-wrap{background:#e0e6eb;border-radius:4px;height:6px;margin:10px 0 6px}.progress-bar{height:6px;border-radius:4px;background:#185fa5;transition:width .2s}.progress-text{font-size:12px;color:#647180;margin-bottom:14px}
 .card{background:#fff;border:1px solid #d7dee5;border-radius:12px;min-height:230px;padding:24px 18px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:10px;margin:14px 0;overflow-wrap:anywhere}
@@ -70,6 +70,10 @@ label.form-label{display:block;font-size:13px;font-weight:700;margin:12px 0 6px}
       <div class="range-grid">
         <input id="min-no" type="text" inputmode="numeric">
         <input id="max-no" type="text" inputmode="numeric">
+      </div>
+      <div class="range-sliders">
+        <input id="min-no-slider" type="range" min="0" max="0" value="0">
+        <input id="max-no-slider" type="range" min="0" max="0" value="0">
       </div>
       <label class="form-label">Order</label>
       <select id="order-select">
@@ -375,11 +379,59 @@ function renderSetup(){
   });
 
   renderSourceLink("source-actions", "source-url-box");
-  $("min-no").value = dataset.items[0].number;
-  $("max-no").value = dataset.items[dataset.items.length - 1].number;
+  setupRangeControls();
   $("count-slider").max = dataset.items.length;
   setCount(selectedCount);
   renderFieldList();
+}
+
+function itemNumbers(){
+  return dataset ? dataset.items.map(item => item.number) : [];
+}
+
+function setupRangeControls(){
+  const numbers = itemNumbers();
+  const last = Math.max(0, numbers.length - 1);
+  ["min-no-slider", "max-no-slider"].forEach(id => {
+    $(id).min = 0;
+    $(id).max = last;
+  });
+  $("min-no-slider").value = 0;
+  $("max-no-slider").value = last;
+  syncNoInputsFromSliders();
+}
+
+function syncNoInputsFromSliders(moved){
+  const numbers = itemNumbers();
+  if(!numbers.length) return;
+  let minIdx = Number($("min-no-slider").value);
+  let maxIdx = Number($("max-no-slider").value);
+  if(minIdx > maxIdx){
+    if(moved === "min"){ maxIdx = minIdx; $("max-no-slider").value = maxIdx; }
+    else { minIdx = maxIdx; $("min-no-slider").value = minIdx; }
+  }
+  $("min-no").value = numbers[minIdx];
+  $("max-no").value = numbers[maxIdx];
+  setCount(selectedCount);
+}
+
+function syncSlidersFromNoInputs(){
+  const numbers = itemNumbers();
+  if(!numbers.length) return;
+  const minValue = Number($("min-no").value);
+  const maxValue = Number($("max-no").value);
+  let minIdx = numbers.findIndex(n => n >= minValue);
+  let maxIdx = numbers.length - 1;
+  for(let i=0;i<numbers.length;i++){
+    if(numbers[i] <= maxValue) maxIdx = i;
+  }
+  if(minIdx < 0) minIdx = 0;
+  if(minIdx > maxIdx) maxIdx = minIdx;
+  $("min-no-slider").value = minIdx;
+  $("max-no-slider").value = maxIdx;
+  $("min-no").value = numbers[minIdx];
+  $("max-no").value = numbers[maxIdx];
+  setCount(selectedCount);
 }
 
 function renderFieldList(){
@@ -662,6 +714,7 @@ function applyQuerySettings(){
   }
   if(params.get("min")) $("min-no").value = params.get("min");
   if(params.get("max")) $("max-no").value = params.get("max");
+  if(params.get("min") || params.get("max")) syncSlidersFromNoInputs();
   if(params.get("order")) $("order-select").value = params.get("order");
   if(params.get("count")) setCount(params.get("count"));
 }
@@ -732,8 +785,10 @@ $("count-minus-5").onclick = () => setCount(selectedCount - 5);
 $("count-minus-1").onclick = () => setCount(selectedCount - 1);
 $("count-plus-1").onclick = () => setCount(selectedCount + 1);
 $("count-plus-5").onclick = () => setCount(selectedCount + 5);
-$("min-no").onchange = () => setCount(selectedCount);
-$("max-no").onchange = () => setCount(selectedCount);
+$("min-no").onchange = syncSlidersFromNoInputs;
+$("max-no").onchange = syncSlidersFromNoInputs;
+$("min-no-slider").oninput = () => syncNoInputsFromSliders("min");
+$("max-no-slider").oninput = () => syncNoInputsFromSliders("max");
 $("start-btn").onclick = startStudy;
 $("share-btn").onclick = showShare;
 $("open-source-btn").onclick = openSourceCsv;
