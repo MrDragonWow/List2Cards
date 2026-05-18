@@ -39,16 +39,17 @@ label.form-label{display:block;font-size:13px;font-weight:700;margin:12px 0 6px}
     <p class="subtitle">Create flashcards from Excel, CSV, or a spreadsheet link.</p>
     <div id="load-notice" class="notice"></div>
     <div class="panel">
-      <label class="form-label" for="file-input">File</label>
-      <input id="file-input" type="file" accept=".csv,.tsv,.txt,.xlsx,.xls">
-      <p class="hint">CSV works offline. Excel requires the import library to be available online.</p>
-      <button class="btn primary" id="file-load-btn">Load File</button>
-    </div>
-    <div class="panel">
       <label class="form-label" for="sheet-url">Spreadsheet Link</label>
       <input id="sheet-url" type="url" placeholder="https://docs.google.com/spreadsheets/d/...">
       <p class="hint">The sheet must be readable as public CSV. First load requires network access.</p>
       <button class="btn primary" id="sheet-load-btn">Load Link</button>
+    </div>
+    <div class="panel">
+      <label class="form-label" for="file-input">File</label>
+      <input id="file-input" type="file" accept=".csv,.tsv,.txt,.xlsx,.xls">
+      <p class="hint">CSV works offline. Excel requires the import library to be available online.</p>
+      <p class="hint">Local files stay on your device, so shared URL / QR links cannot be created from offline file loads.</p>
+      <button class="btn primary" id="file-load-btn">Load File</button>
     </div>
     <div class="panel">
       <p class="hint">Template: Row 1 headers / A:List / B:Author / C:Tags / D:No. / E+:Card fields</p>
