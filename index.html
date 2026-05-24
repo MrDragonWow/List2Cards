@@ -6,30 +6,34 @@
 <title>Flashcards</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:"Hiragino Sans","Meiryo",sans-serif;background:#f4f6f8;color:#1d2329;min-height:100vh}
-#app{max-width:520px;margin:0 auto;padding:16px}
+body{font-family:"Hiragino Sans","Meiryo",sans-serif;background:#eef2f5;color:#1d2329;min-height:100vh}
+#app{max-width:560px;margin:0 auto;padding:18px 16px 24px}
 .screen{display:none}.screen.active{display:block}
-h1{font-size:24px;font-weight:700;margin:10px 0 4px}h2{font-size:19px;font-weight:700;margin:8px 0 12px}
+h1{font-size:28px;font-weight:800;margin:10px 0 4px;letter-spacing:0}h2{font-size:19px;font-weight:800;margin:8px 0 12px}
 .subtitle,.hint{font-size:13px;color:#647180;line-height:1.6}.hint{margin:6px 0 12px}
-.panel{background:#fff;border:1px solid #dfe5ea;border-radius:8px;padding:14px;margin:12px 0}
-.btn{display:block;width:100%;padding:12px 14px;border-radius:8px;border:1px solid #cbd3da;background:#fff;color:#1d2329;font-size:15px;cursor:pointer;text-align:center;margin:8px 0}
-.btn:disabled{opacity:.45;cursor:not-allowed}.btn.primary{background:#185fa5;border-color:#0c447c;color:#fff}.btn.success{background:#3b6d11;border-color:#27500a;color:#fff}.btn.danger{background:#a32d2d;border-color:#791f1f;color:#fff}.btn.ghost{text-align:left}
+.panel{background:#fff;border:1px solid #dfe5ea;border-radius:8px;padding:15px;margin:12px 0;box-shadow:0 1px 2px rgba(15,23,42,.04)}
+.btn{display:block;width:100%;min-height:46px;padding:12px 14px;border-radius:8px;border:1px solid #cbd3da;background:#fff;color:#1d2329;font-size:15px;font-weight:700;cursor:pointer;text-align:center;margin:8px 0;transition:transform .08s ease,background .15s ease,border-color .15s ease}
+.btn:hover:not(:disabled){background:#f8fafc;border-color:#aeb8c2}.btn:active:not(:disabled){transform:translateY(1px)}
+.btn:disabled{opacity:.45;cursor:not-allowed}.btn.primary{background:#185fa5;border-color:#0c447c;color:#fff}.btn.primary:hover:not(:disabled){background:#124f8c}.btn.success{background:#3b6d11;border-color:#27500a;color:#fff}.btn.success:hover:not(:disabled){background:#315d0e}.btn.danger{background:#a32d2d;border-color:#791f1f;color:#fff}.btn.danger:hover:not(:disabled){background:#8e2727}.btn.ghost{text-align:left}
 .btn-row{display:flex;gap:8px}.btn-row .btn{margin:0}.btn.small{padding:8px 9px;font-size:13px}
-input[type="text"],input[type="url"],input[type="file"],select{width:100%;padding:11px;border:1px solid #cbd3da;border-radius:8px;background:#fff;font-size:15px}
+input[type="text"],input[type="url"],input[type="file"],select{width:100%;min-height:44px;padding:11px;border:1px solid #cbd3da;border-radius:8px;background:#fff;font-size:15px}
+input:focus,select:focus,.btn:focus-visible,.choice:focus-visible{outline:3px solid rgba(24,95,165,.22);outline-offset:2px}
 input[type="range"]{width:100%;accent-color:#185fa5}
 label.form-label{display:block;font-size:13px;font-weight:700;margin:12px 0 6px}
 .notice{display:none;border-radius:8px;padding:10px 12px;margin:10px 0;font-size:13px;line-height:1.5}.notice.show{display:block}.notice.error{background:#fcebeb;color:#8d2525;border:1px solid #f1b8b8}.notice.info{background:#eaf3fb;color:#194f7b;border:1px solid #b8d8ef}
-.meta{font-size:13px;line-height:1.7;color:#47535f}.meta strong{color:#1d2329}
+.caution{border:1px solid #f0c36d;background:#fff8e5;color:#6a4a00;border-radius:8px;padding:10px 12px;font-size:13px;line-height:1.5;margin:10px 0 12px}
+.meta{font-size:13px;line-height:1.7;color:#47535f}.meta strong{color:#1d2329}.meta div{display:flex;justify-content:space-between;gap:12px;border-bottom:1px solid #edf1f4;padding:3px 0}.meta div:last-child{border-bottom:0}
 .range-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.range-sliders{display:grid;grid-template-columns:1fr;gap:8px;margin-top:10px}.count-row{display:grid;grid-template-columns:auto auto 1fr auto auto;gap:6px;align-items:center}.count-display{text-align:center;font-weight:700;font-size:16px}
-.choice-list{display:flex;flex-direction:column;gap:8px;margin:10px 0}.choice{display:grid;grid-template-columns:30px 1fr;gap:10px;align-items:center;padding:12px;border:1px solid #d7dee5;border-radius:8px;background:#fff;cursor:pointer}.choice.selected{border-color:#185fa5;background:#edf5fc}.choice-num{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;background:#e2e8ee;color:#55616d}.choice.selected .choice-num{background:#185fa5;color:#fff}
+.choice-list{display:flex;flex-direction:column;gap:8px;margin:10px 0}.choice{display:grid;grid-template-columns:30px 1fr;gap:10px;align-items:center;padding:12px;border:1px solid #d7dee5;border-radius:8px;background:#fff;cursor:pointer}.choice:hover{border-color:#aeb8c2}.choice.selected{border-color:#185fa5;background:#edf5fc}.choice-num{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;background:#e2e8ee;color:#55616d}.choice.selected .choice-num{background:#185fa5;color:#fff}
 .progress-wrap{background:#e0e6eb;border-radius:4px;height:6px;margin:10px 0 6px}.progress-bar{height:6px;border-radius:4px;background:#185fa5;transition:width .2s}.progress-text{font-size:12px;color:#647180;margin-bottom:14px}
-.card{background:#fff;border:1px solid #d7dee5;border-radius:12px;min-height:230px;padding:24px 18px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:10px;margin:14px 0;overflow-wrap:anywhere}
+.card{background:#fff;border:1px solid #d7dee5;border-radius:12px;min-height:260px;padding:26px 18px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:10px;margin:14px 0;overflow-wrap:anywhere;box-shadow:0 8px 24px rgba(15,23,42,.07)}
 .card-label{font-size:13px;color:#647180}.card-main{font-size:30px;font-weight:700;white-space:pre-wrap;line-height:1.35}.card-sub{font-size:13px;color:#7b8793}
 .next-field{font-size:13px;color:#185fa5;font-weight:700}
 .stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0}.stat{background:#fff;border:1px solid #dfe5ea;border-radius:8px;padding:12px;text-align:center}.stat-label{font-size:12px;color:#647180}.stat-num{font-size:24px;font-weight:700}.ok{color:#3b6d11}.ng{color:#a32d2d}
 .result-item{display:grid;grid-template-columns:1fr auto;gap:10px;padding:10px 0;border-bottom:1px solid #e5eaee;font-size:13px}.result-main{font-weight:700}.result-sub{color:#647180;margin-top:3px;white-space:pre-wrap}.badge{border-radius:6px;padding:3px 9px;font-size:12px;align-self:start}.badge.ok{background:#eaf3de}.badge.ng{background:#fcebeb}
 #qr-img{display:block;max-width:220px;width:70%;margin:12px auto;border:1px solid #dfe5ea;border-radius:8px}
 .link-box{font-size:12px;word-break:break-all;color:#47535f;background:#f7f9fb;border:1px solid #dfe5ea;border-radius:8px;padding:9px}
+@media (max-width:420px){#app{padding:14px 12px 22px}.btn-row{flex-direction:column}.stat-row{grid-template-columns:1fr}.card-main{font-size:26px}.count-row{grid-template-columns:1fr 1fr}.count-row input{grid-column:1 / -1;grid-row:1}}
 </style>
 </head>
 <body>
@@ -42,6 +46,8 @@ label.form-label{display:block;font-size:13px;font-weight:700;margin:12px 0 6px}
       <label class="form-label" for="sheet-url">Spreadsheet Link</label>
       <input id="sheet-url" type="url" placeholder="https://docs.google.com/spreadsheets/d/...">
       <p class="hint">The sheet must be readable as public CSV. First load requires network access.</p>
+      <p class="caution"><strong>Caution:</strong> Before sharing or loading a Google Sheets CSV link, set the Google Drive sharing permission to <strong>Anyone with the link: Viewer</strong>.</p>
+      <p class="hint">To understand which lists are being used, this app can record the loaded list link and load time. It does not record names, email addresses, device IDs, or answers.</p>
       <button class="btn primary" id="sheet-load-btn">Load Link</button>
     </div>
     <div class="panel">
@@ -53,12 +59,14 @@ label.form-label{display:block;font-size:13px;font-weight:700;margin:12px 0 6px}
     </div>
     <div class="panel">
       <p class="hint">Template: Row 1 headers / A:List / B:Author / C:Tags / D:No. / E+:Card fields</p>
+      <button class="btn" id="sample-load-btn">Try Sample List</button>
     </div>
   </section>
 
   <section id="s-setup" class="screen">
     <h2>Practice Setup</h2>
     <div class="panel meta" id="list-meta"></div>
+    <button class="btn primary" id="start-top-btn">Start ▶</button>
     <div id="source-actions" style="display:none">
       <div class="panel">
         <label class="form-label">Shared List Link</label>
@@ -106,8 +114,10 @@ label.form-label{display:block;font-size:13px;font-weight:700;margin:12px 0 6px}
     <h2>Share URL / QR</h2>
     <div class="panel">
       <p class="hint">When loaded from a spreadsheet link, this URL shares the same practice settings.</p>
+      <div id="share-notice" class="notice"></div>
       <img id="qr-img" alt="QR code">
       <div class="link-box" id="share-url"></div>
+      <button class="btn primary" id="copy-share-btn">Copy URL</button>
       <button class="btn" id="share-source-btn">Open Link ↗</button>
     </div>
     <button class="btn" onclick="goTo('s-setup')">← Back</button>
@@ -159,6 +169,12 @@ label.form-label{display:block;font-size:13px;font-weight:700;margin:12px 0 6px}
 <script>
 const MAX_ITEMS = 1000;
 const NONE_TEXT = "(None)";
+const SHARE_PERMISSION_HINT = "Make sure the Google Drive sharing permission is set to 'Anyone with the link: Viewer'.";
+const USAGE_LOG_ENDPOINT = "https://script.google.com/macros/s/AKfycbwmWYpnP1hfsUZLDh_L31v7xzbrI_6Y8IRdiNUf3F-dwS4DdyytWyeueTrFrzdgMVU2/exec";
+const SAMPLE_CSV = `リスト名,作成者,タグ,No.,熟語,読み,意味,例文
+N2熟語,ryo,"日本語,N2,熟語",1,気が重い,きがおもい,気分が進まない,明日の試験を考えると気が重い。
+N2熟語,ryo,"日本語,N2,熟語",2,手を抜く,てをぬく,必要な努力を省く,大事な仕事で手を抜いてはいけない。
+N2熟語,ryo,"日本語,N2,熟語",3,顔を出す,かおをだす,少しだけ参加する,時間があれば会議に顔を出します。`;
 let dataset = null;
 let selectedFields = [];
 let selectedCount = 1;
@@ -277,6 +293,47 @@ function googleSheetCsvUrl(url){
   return `https://docs.google.com/spreadsheets/d/${match[1]}/export?format=csv&gid=${gid}`;
 }
 
+function usageLogKey(url){
+  let hash = 2166136261;
+  for(let i=0;i<url.length;i++){
+    hash ^= url.charCodeAt(i);
+    hash = Math.imul(hash, 16777619);
+  }
+  return "flashcards:usage-logged:v2:" + (hash >>> 0).toString(16);
+}
+
+function hasLoggedSource(url){
+  try{ return localStorage.getItem(usageLogKey(url)) === "1"; }
+  catch(e){ return false; }
+}
+
+function markSourceLogged(url){
+  try{ localStorage.setItem(usageLogKey(url), "1"); }catch(e){}
+}
+
+function logSourceLoadOnce(url){
+  if(!USAGE_LOG_ENDPOINT || !url || hasLoggedSource(url)) return;
+  const loadedAt = new Date().toISOString();
+  const payload = JSON.stringify({
+    csv_url: url,
+    loaded_at: loadedAt
+  });
+  markSourceLogged(url);
+  try{
+    const body = new Blob([payload], { type: "text/plain" });
+    if(navigator.sendBeacon && navigator.sendBeacon(USAGE_LOG_ENDPOINT, body)) return;
+  }catch(e){}
+  try{
+    fetch(USAGE_LOG_ENDPOINT, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "text/plain" },
+      body: payload,
+      keepalive: true
+    }).catch(() => {});
+  }catch(e){}
+}
+
 function googleVizUrl(url, callbackName){
   if(/\/spreadsheets\/d\/e\//.test(url)) return "";
   const normalMatch = url.match(/\/spreadsheets\/d\/([^/]+)/);
@@ -341,6 +398,7 @@ function loadGoogleSheetViaJsonp(url){
 async function loadDatasetFromRows(rows, src=""){
   dataset = normalizeRows(rows);
   sourceUrl = src;
+  logSourceLoadOnce(sourceUrl);
   selectedFields = restoreFieldSelection();
   selectedCount = Math.min(15, dataset.items.length);
   renderSetup();
@@ -502,10 +560,10 @@ function startStudy(){
     const targets = targetFields.map(field => {
       const answer = item.fields[field] || "";
       return { field, answer, active: Boolean(answer) };
-    });
-    studyQueue.push({ item, baseField, targets });
+    }).filter(target => target.active);
+    if(targets.length) studyQueue.push({ item, baseField, targets });
   });
-  if(!studyQueue.some(card => card.targets.some(target => target.active))){
+  if(!studyQueue.length){
     setNotice("setup-notice", "No answer data found in the selected fields.");
     return;
   }
@@ -559,8 +617,8 @@ function showAnswer(){
   $("card-sub").textContent = `${card.baseField}: ${card.item.fields[card.baseField] || NONE_TEXT}`;
   $("next-field").textContent = nextTarget ? `Next → ${nextTarget.field}` : "";
   $("answer-actions").style.display = "none";
-  $("judge-actions").style.display = target.active ? "block" : "none";
-  $("skip-actions").style.display = target.active ? "none" : "block";
+  $("judge-actions").style.display = "block";
+  $("skip-actions").style.display = "none";
   showingAnswer = true;
 }
 
@@ -687,10 +745,34 @@ function showShare(){
     goTo("s-setup");
     return;
   }
+  setNotice("share-notice", "");
   $("share-url").textContent = url;
   $("qr-img").src = "https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=" + encodeURIComponent(url);
   $("share-source-btn").style.display = sourceUrl ? "block" : "none";
   goTo("s-share");
+}
+
+async function copyShareUrl(){
+  const url = $("share-url").textContent.trim();
+  if(!url) return;
+  try{
+    if(navigator.clipboard && window.isSecureContext){
+      await navigator.clipboard.writeText(url);
+    }else{
+      const textarea = document.createElement("textarea");
+      textarea.value = url;
+      textarea.setAttribute("readonly", "");
+      textarea.style.position = "fixed";
+      textarea.style.left = "-9999px";
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand("copy");
+      textarea.remove();
+    }
+    setNotice("share-notice", "URL copied.", "info");
+  }catch(err){
+    setNotice("share-notice", "Could not copy automatically. Select and copy the URL manually.");
+  }
 }
 
 function openSourceCsv(){
@@ -743,7 +825,7 @@ async function loadFromSheetUrl(url){
   const csvUrl = googleSheetCsvUrl(url);
   try{
     const res = await fetch(csvUrl);
-    if(!res.ok) throw new Error("Could not load the spreadsheet. Check sharing settings.");
+    if(!res.ok) throw new Error("Could not load the spreadsheet. " + SHARE_PERMISSION_HINT);
     const text = await res.text();
     await loadDatasetFromRows(parseCsv(text), url);
   }catch(fetchError){
@@ -753,9 +835,9 @@ async function loadFromSheetUrl(url){
       await loadDatasetFromRows(rows, url);
     }catch(jsonpError){
       if(/\/spreadsheets\/d\/e\//.test(url)){
-        throw new Error("This published CSV URL could not be read from the browser. Try the normal sheet share URL with 'Anyone with the link: Viewer', or download the CSV and load it as a file.");
+        throw new Error("This published CSV URL could not be read from the browser. Try the normal sheet share URL, or download the CSV and load it as a file. " + SHARE_PERMISSION_HINT);
       }
-      throw jsonpError;
+      throw new Error((jsonpError.message || "Could not read the spreadsheet.") + " " + SHARE_PERMISSION_HINT);
     }
   }
 }
@@ -786,6 +868,12 @@ $("sheet-load-btn").onclick = async () => {
   catch(err){ setNotice("load-notice", err.message || "Load failed."); }
 };
 
+$("sample-load-btn").onclick = async () => {
+  setNotice("load-notice", "");
+  try{ await loadDatasetFromRows(parseCsv(SAMPLE_CSV), ""); }
+  catch(err){ setNotice("load-notice", err.message || "Sample load failed."); }
+};
+
 $("count-slider").oninput = e => setCount(e.target.value);
 $("count-minus-5").onclick = () => setCount(selectedCount - 5);
 $("count-minus-1").onclick = () => setCount(selectedCount - 1);
@@ -796,15 +884,35 @@ $("max-no").onchange = syncSlidersFromNoInputs;
 $("min-no-slider").oninput = () => syncNoInputsFromSliders("min");
 $("max-no-slider").oninput = () => syncNoInputsFromSliders("max");
 $("start-btn").onclick = startStudy;
+$("start-top-btn").onclick = startStudy;
 $("share-btn").onclick = showShare;
 $("open-source-btn").onclick = openSourceCsv;
 $("share-source-btn").onclick = openSourceCsv;
+$("copy-share-btn").onclick = copyShareUrl;
 $("result-open-source-btn").onclick = openSourceCsv;
 $("answer-btn").onclick = showAnswer;
 $("ok-btn").onclick = () => judge(true);
 $("ng-btn").onclick = () => judge(false);
 $("skip-btn").onclick = skipTask;
 $("retry-btn").onclick = retryWrong;
+
+document.addEventListener("keydown", event => {
+  if(["INPUT", "SELECT", "TEXTAREA"].includes(document.activeElement.tagName)) return;
+  if($("s-study").classList.contains("active")){
+    if(event.key === "Enter" || event.key === " "){
+      event.preventDefault();
+      if($("answer-actions").style.display !== "none") showAnswer();
+    }else if(event.key === "1"){
+      if($("judge-actions").style.display !== "none") judge(true);
+    }else if(event.key === "2"){
+      if($("judge-actions").style.display !== "none") judge(false);
+    }else if(event.key === "ArrowRight"){
+      if($("skip-actions").style.display !== "none") skipTask();
+    }else if(event.key === "Escape"){
+      goTo("s-setup");
+    }
+  }
+});
 
 initFromQuery();
 </script>
