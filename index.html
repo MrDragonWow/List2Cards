@@ -24,6 +24,7 @@ label.form-label{display:block;font-size:13px;font-weight:700;margin:12px 0 6px}
 .caution{border:1px solid #f0c36d;background:#fff8e5;color:#6a4a00;border-radius:8px;padding:10px 12px;font-size:13px;line-height:1.5;margin:10px 0 12px}
 .meta{font-size:13px;line-height:1.7;color:#47535f}.meta strong{color:#1d2329}.meta div{display:flex;justify-content:space-between;gap:12px;border-bottom:1px solid #edf1f4;padding:3px 0}.meta div:last-child{border-bottom:0}
 .range-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.range-sliders{display:grid;grid-template-columns:1fr;gap:8px;margin-top:10px}.count-row{display:grid;grid-template-columns:auto auto 1fr auto auto;gap:6px;align-items:center}.count-display{text-align:center;font-weight:700;font-size:16px}
+.tag-tools{display:grid;grid-template-columns:1fr 1fr;gap:8px}.tag-tools .btn{grid-column:1 / -1}
 .choice-list{display:flex;flex-direction:column;gap:8px;margin:10px 0}.choice{display:grid;grid-template-columns:30px 1fr;gap:10px;align-items:center;padding:12px;border:1px solid #d7dee5;border-radius:8px;background:#fff;cursor:pointer}.choice:hover{border-color:#aeb8c2}.choice.selected{border-color:#185fa5;background:#edf5fc}.choice-num{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;background:#e2e8ee;color:#55616d}.choice.selected .choice-num{background:#185fa5;color:#fff}
 .progress-wrap{background:#e0e6eb;border-radius:4px;height:6px;margin:10px 0 6px}.progress-bar{height:6px;border-radius:4px;background:#185fa5;transition:width .2s}.progress-text{font-size:12px;color:#647180;margin-bottom:14px}
 .card{background:#fff;border:1px solid #d7dee5;border-radius:12px;min-height:260px;padding:26px 18px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:10px;margin:14px 0;overflow-wrap:anywhere;box-shadow:0 8px 24px rgba(15,23,42,.07)}
@@ -41,6 +42,7 @@ label.form-label{display:block;font-size:13px;font-weight:700;margin:12px 0 6px}
   <section id="s-load" class="screen active">
     <h1>Flashcards</h1>
     <p class="subtitle">Create flashcards from Excel, CSV, or a spreadsheet link.</p>
+    <a class="btn" href="https://chatgpt.com/g/g-6a1375f839448191a389748cd4c14ad7-manual-for-list2card" target="_blank" rel="noopener noreferrer">Manual GPTs ↗</a>
     <p class="caution"><strong>Caution:</strong> If browser translation such as Google Translate is on, turn it off before studying. Automatic translation can change the words on your flashcards.</p>
     <div id="load-notice" class="notice"></div>
     <div class="panel">
@@ -59,7 +61,7 @@ label.form-label{display:block;font-size:13px;font-weight:700;margin:12px 0 6px}
       <button class="btn primary" id="file-load-btn">Load File</button>
     </div>
     <div class="panel">
-      <p class="hint">Template: Row 1 headers / A:List / B:Author / C:Tags / D:No. / E+:Card fields</p>
+      <p class="hint">Template: Row 1 headers / A:No. / B:Tags / C+:Card fields</p>
       <button class="btn" id="sample-load-btn">Try Sample List</button>
     </div>
   </section>
@@ -85,6 +87,20 @@ label.form-label{display:block;font-size:13px;font-weight:700;margin:12px 0 6px}
       <div class="range-sliders">
         <input id="min-no-slider" type="range" min="0" max="0" value="0">
         <input id="max-no-slider" type="range" min="0" max="0" value="0">
+      </div>
+      <div id="tag-panel">
+        <label class="form-label">Tags</label>
+        <p class="hint">Select one or more tags. Use a range for pages or lessons.</p>
+        <div class="tag-tools">
+          <select id="tag-from-select"></select>
+          <select id="tag-to-select"></select>
+          <button class="btn small" id="tag-range-btn">Use Tag Range</button>
+        </div>
+        <div class="btn-row">
+          <button class="btn small" id="tag-all-btn">All Tags</button>
+          <button class="btn small" id="tag-clear-btn">Clear Tags</button>
+        </div>
+        <div class="choice-list" id="tag-list"></div>
       </div>
       <label class="form-label">Order</label>
       <select id="order-select">
@@ -172,12 +188,13 @@ const MAX_ITEMS = 1000;
 const NONE_TEXT = "(None)";
 const SHARE_PERMISSION_HINT = "Make sure the Google Drive sharing permission is set to 'Anyone with the link: Viewer'.";
 const USAGE_LOG_ENDPOINT = "https://script.google.com/macros/s/AKfycbwmWYpnP1hfsUZLDh_L31v7xzbrI_6Y8IRdiNUf3F-dwS4DdyytWyeueTrFrzdgMVU2/exec";
-const SAMPLE_CSV = `リスト名,作成者,タグ,No.,熟語,読み,意味,例文
-N2熟語,ryo,"日本語,N2,熟語",1,気が重い,きがおもい,気分が進まない,明日の試験を考えると気が重い。
-N2熟語,ryo,"日本語,N2,熟語",2,手を抜く,てをぬく,必要な努力を省く,大事な仕事で手を抜いてはいけない。
-N2熟語,ryo,"日本語,N2,熟語",3,顔を出す,かおをだす,少しだけ参加する,時間があれば会議に顔を出します。`;
+const SAMPLE_CSV = `No.,Tags,熟語,読み,意味,例文
+1,1課,気が重い,きがおもい,気分が進まない,明日の試験を考えると気が重い。
+2,1課,手を抜く,てをぬく,必要な努力を省く,大事な仕事で手を抜いてはいけない。
+3,2課,顔を出す,かおをだす,少しだけ参加する,時間があれば会議に顔を出します。`;
 let dataset = null;
 let selectedFields = [];
+let selectedTags = [];
 let selectedCount = 1;
 let studyQueue = [];
 let currentCardIndex = 0;
@@ -230,34 +247,60 @@ function parseCsv(text){
   return rows.filter(r => r.some(c => String(c).trim() !== ""));
 }
 
-function normalizeRows(rows){
+function splitTags(value){
+  return String(value || "").split(/[,、]/).map(t => t.trim()).filter(Boolean);
+}
+
+function uniqueTags(items){
+  const seen = new Set();
+  const tags = [];
+  items.forEach(item => {
+    item.tags.forEach(tag => {
+      if(seen.has(tag)) return;
+      seen.add(tag);
+      tags.push(tag);
+    });
+  });
+  return tags;
+}
+
+function cleanListName(name, fallback="Untitled"){
+  const base = String(name || "").trim().replace(/\.(csv|tsv|txt|xlsx|xls)$/i, "");
+  return base || fallback;
+}
+
+function contentDispositionFileName(value){
+  const header = String(value || "");
+  const utf = header.match(/filename\*=UTF-8''([^;]+)/i);
+  if(utf) return decodeURIComponent(utf[1].replace(/"/g, ""));
+  const plain = header.match(/filename="?([^";]+)"?/i);
+  return plain ? plain[1] : "";
+}
+
+function normalizeRows(rows, listNameHint="Untitled"){
   if(rows.length < 2) throw new Error("Row 1 headers and at least one data row are required.");
   const header = rows[0].map(c => String(c || "").trim());
-  if(header.length < 6) throw new Error("Columns A-D and at least two card fields from column E are required.");
-  if(!header[0] || !header[1] || !header[2]) throw new Error("Columns A-C need headers for List, Author, and Tags.");
-  if(!header[3]) throw new Error("Column D needs a No. header.");
-  const fieldNames = header.slice(4).map(c => String(c || "").trim()).filter(Boolean);
-  if(fieldNames.length < 2) throw new Error("Add at least two headers from column E onward.");
+  if(header.length < 4) throw new Error("Columns A-B and at least two card fields from column C are required.");
+  if(!header[0]) throw new Error("Column A needs a No. header.");
+  if(!header[1]) throw new Error("Column B needs a Tags header.");
+  const fieldNames = header.slice(2).map(c => String(c || "").trim()).filter(Boolean);
+  if(fieldNames.length < 2) throw new Error("Add at least two headers from column C onward.");
 
-  const firstData = rows.find((r, idx) => idx > 0 && r.some(c => String(c || "").trim() !== ""));
-  const listName = String((firstData && firstData[0]) || rows[1][0] || "Untitled").trim() || "Untitled";
-  const author = String((firstData && firstData[1]) || rows[1][1] || "").trim();
-  const tags = String((firstData && firstData[2]) || rows[1][2] || "")
-    .split(/[,、]/).map(t => t.trim()).filter(Boolean);
+  const listName = cleanListName(listNameHint);
   const seen = new Set();
   const items = [];
 
   rows.slice(1).forEach((r, idx) => {
     if(!r.some(c => String(c || "").trim() !== "")) return;
-    const number = Number(String(r[3] || "").trim());
-    if(!Number.isFinite(number)) throw new Error(`Row ${idx + 2}: column D No. must be numeric.`);
-    if(seen.has(number)) throw new Error(`Column D No. ${number} is duplicated.`);
+    const number = Number(String(r[0] || "").trim());
+    if(!Number.isFinite(number)) throw new Error(`Row ${idx + 2}: column A No. must be numeric.`);
+    if(seen.has(number)) throw new Error(`Column A No. ${number} is duplicated.`);
     seen.add(number);
     const fields = {};
     fieldNames.forEach((name, fieldIdx) => {
-      fields[name] = String(r[fieldIdx + 4] || "").trim();
+      fields[name] = String(r[fieldIdx + 2] || "").trim();
     });
-    items.push({ number, fields });
+    items.push({ number, tags: splitTags(r[1]), fields });
   });
 
   if(items.length === 0) throw new Error("No valid card data found.");
@@ -266,7 +309,7 @@ function normalizeRows(rows){
     items.length = MAX_ITEMS;
     setNotice("setup-notice", "More than 1000 items found. Only the first 1000 were loaded.", "info");
   }
-  return { listName, author, tags, fieldNames, items };
+  return { listName, tags: uniqueTags(items), fieldNames, items };
 }
 
 async function loadExcel(file){
@@ -396,11 +439,12 @@ function loadGoogleSheetViaJsonp(url){
   });
 }
 
-async function loadDatasetFromRows(rows, src=""){
-  dataset = normalizeRows(rows);
+async function loadDatasetFromRows(rows, src="", listNameHint="Untitled"){
+  dataset = normalizeRows(rows, listNameHint);
   sourceUrl = src;
   logSourceLoadOnce(sourceUrl);
   selectedFields = restoreFieldSelection();
+  selectedTags = dataset.tags.slice();
   selectedCount = Math.min(15, dataset.items.length);
   renderSetup();
   applyQuerySettings();
@@ -409,7 +453,7 @@ async function loadDatasetFromRows(rows, src=""){
 
 function datasetKey(){
   if(!dataset) return "";
-  return "flashcards:fields:" + [dataset.listName, dataset.author, dataset.tags.join(","), dataset.fieldNames.join("|")].join("::");
+  return "flashcards:fields:" + [dataset.listName, dataset.tags.join(","), dataset.fieldNames.join("|")].join("::");
 }
 
 function restoreFieldSelection(){
@@ -429,7 +473,6 @@ function renderSetup(){
   $("list-meta").textContent = "";
   const lines = [
     `List: ${dataset.listName}`,
-    `Author: ${dataset.author || "-"}`,
     `Tags: ${dataset.tags.join(", ") || "-"}`,
     `Items: ${dataset.items.length}`,
     `Fields: ${dataset.fieldNames.join(" / ")}`
@@ -442,8 +485,10 @@ function renderSetup(){
 
   renderSourceLink("source-actions", "source-url-box");
   setupRangeControls();
+  setupTagControls();
   $("count-slider").max = dataset.items.length;
   setCount(selectedCount);
+  renderTagList();
   renderFieldList();
 }
 
@@ -496,6 +541,79 @@ function syncSlidersFromNoInputs(){
   setCount(selectedCount);
 }
 
+function setupTagControls(){
+  const panel = $("tag-panel");
+  if(!dataset.tags.length){
+    panel.style.display = "none";
+    selectedTags = [];
+    return;
+  }
+  panel.style.display = "block";
+  ["tag-from-select", "tag-to-select"].forEach(id => {
+    const select = $(id);
+    select.textContent = "";
+    dataset.tags.forEach(tag => {
+      const option = document.createElement("option");
+      option.value = tag;
+      option.textContent = tag;
+      select.appendChild(option);
+    });
+  });
+  $("tag-from-select").value = selectedTags[0] || dataset.tags[0];
+  $("tag-to-select").value = selectedTags[selectedTags.length - 1] || dataset.tags[dataset.tags.length - 1];
+}
+
+function renderTagList(){
+  const list = $("tag-list");
+  list.textContent = "";
+  if(!dataset.tags.length) return;
+  dataset.tags.forEach(tag => {
+    const div = document.createElement("div");
+    const selected = selectedTags.includes(tag);
+    div.className = "choice" + (selected ? " selected" : "");
+    const num = document.createElement("div");
+    num.className = "choice-num";
+    num.textContent = selected ? "✓" : "";
+    const label = document.createElement("div");
+    label.textContent = tag;
+    div.append(num, label);
+    div.onclick = () => toggleTag(tag);
+    list.appendChild(div);
+  });
+}
+
+function toggleTag(tag){
+  const idx = selectedTags.indexOf(tag);
+  if(idx >= 0) selectedTags.splice(idx, 1);
+  else selectedTags.push(tag);
+  selectedTags.sort((a,b) => dataset.tags.indexOf(a) - dataset.tags.indexOf(b));
+  setCount(selectedCount);
+  renderTagList();
+}
+
+function selectAllTags(){
+  selectedTags = dataset.tags.slice();
+  setCount(selectedCount);
+  renderTagList();
+}
+
+function clearTags(){
+  selectedTags = [];
+  setCount(selectedCount);
+  renderTagList();
+}
+
+function selectTagRange(){
+  const from = dataset.tags.indexOf($("tag-from-select").value);
+  const to = dataset.tags.indexOf($("tag-to-select").value);
+  if(from < 0 || to < 0) return;
+  const start = Math.min(from, to);
+  const end = Math.max(from, to);
+  selectedTags = dataset.tags.slice(start, end + 1);
+  setCount(selectedCount);
+  renderTagList();
+}
+
 function renderFieldList(){
   const list = $("field-list");
   list.textContent = "";
@@ -534,7 +652,13 @@ function filteredItems(){
   if(!dataset) return [];
   const min = Number($("min-no").value);
   const max = Number($("max-no").value);
-  return dataset.items.filter(item => item.number >= min && item.number <= max);
+  const tagSet = new Set(selectedTags);
+  return dataset.items.filter(item => {
+    if(item.number < min || item.number > max) return false;
+    if(!dataset.tags.length) return true;
+    if(!tagSet.size) return false;
+    return item.tags.some(tag => tagSet.has(tag));
+  });
 }
 
 function makeStudyItems(){
@@ -551,7 +675,7 @@ function startStudy(){
   }
   const items = makeStudyItems();
   if(!items.length){
-    setNotice("setup-notice", "No cards found in this No. range.");
+    setNotice("setup-notice", "No cards found in this No. or tag range.");
     return;
   }
   studyQueue = [];
@@ -732,6 +856,7 @@ function buildShareUrl(){
   const params = new URLSearchParams();
   params.set("src", sourceUrl);
   params.set("fields", selectedFields.join("|"));
+  params.set("tags", selectedTags.join("|"));
   params.set("min", $("min-no").value);
   params.set("max", $("max-no").value);
   params.set("count", String(selectedCount));
@@ -804,6 +929,10 @@ function applyQuerySettings(){
   if(params.get("min")) $("min-no").value = params.get("min");
   if(params.get("max")) $("max-no").value = params.get("max");
   if(params.get("min") || params.get("max")) syncSlidersFromNoInputs();
+  if(params.has("tags")){
+    selectedTags = (params.get("tags") || "").split("|").filter(Boolean).filter(tag => dataset.tags.includes(tag));
+    renderTagList();
+  }
   if(params.get("order")) $("order-select").value = params.get("order");
   if(params.get("count")) setCount(params.get("count"));
 }
@@ -827,13 +956,14 @@ async function loadFromSheetUrl(url){
   try{
     const res = await fetch(csvUrl);
     if(!res.ok) throw new Error("Could not load the spreadsheet. " + SHARE_PERMISSION_HINT);
+    const listName = cleanListName(contentDispositionFileName(res.headers.get("content-disposition")), "Spreadsheet");
     const text = await res.text();
-    await loadDatasetFromRows(parseCsv(text), url);
+    await loadDatasetFromRows(parseCsv(text), url, listName);
   }catch(fetchError){
     if(!/docs\.google\.com\/spreadsheets/.test(url)) throw fetchError;
     try{
       const rows = await loadGoogleSheetViaJsonp(url);
-      await loadDatasetFromRows(rows, url);
+      await loadDatasetFromRows(rows, url, "Spreadsheet");
     }catch(jsonpError){
       if(/\/spreadsheets\/d\/e\//.test(url)){
         throw new Error("This published CSV URL could not be read from the browser. Try the normal sheet share URL, or download the CSV and load it as a file. " + SHARE_PERMISSION_HINT);
@@ -855,7 +985,7 @@ $("file-load-btn").onclick = async () => {
       rows = parseCsv(await file.text());
     }
     sourceUrl = "";
-    await loadDatasetFromRows(rows, "");
+    await loadDatasetFromRows(rows, "", file.name);
   }catch(err){
     setNotice("load-notice", err.message || "Load failed.");
   }
@@ -871,7 +1001,7 @@ $("sheet-load-btn").onclick = async () => {
 
 $("sample-load-btn").onclick = async () => {
   setNotice("load-notice", "");
-  try{ await loadDatasetFromRows(parseCsv(SAMPLE_CSV), ""); }
+  try{ await loadDatasetFromRows(parseCsv(SAMPLE_CSV), "", "Sample Flashcards"); }
   catch(err){ setNotice("load-notice", err.message || "Sample load failed."); }
 };
 
@@ -884,6 +1014,9 @@ $("min-no").onchange = syncSlidersFromNoInputs;
 $("max-no").onchange = syncSlidersFromNoInputs;
 $("min-no-slider").oninput = () => syncNoInputsFromSliders("min");
 $("max-no-slider").oninput = () => syncNoInputsFromSliders("max");
+$("tag-range-btn").onclick = selectTagRange;
+$("tag-all-btn").onclick = selectAllTags;
+$("tag-clear-btn").onclick = clearTags;
 $("start-btn").onclick = startStudy;
 $("start-top-btn").onclick = startStudy;
 $("share-btn").onclick = showShare;
