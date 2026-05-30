@@ -19,8 +19,9 @@ h1{font-size:24px;font-weight:800;margin:10px 0 4px;letter-spacing:0}h2{font-siz
 .btn:hover:not(:disabled){background:#f8fafc;border-color:#aeb8c2}.btn:active:not(:disabled){transform:translateY(1px)}
 .btn:disabled{opacity:.45;cursor:not-allowed}.btn.primary{background:#185fa5;border-color:#0c447c;color:#fff}.btn.primary:hover:not(:disabled){background:#124f8c}.btn.success{background:#3b6d11;border-color:#27500a;color:#fff}.btn.success:hover:not(:disabled){background:#315d0e}.btn.danger{background:#a32d2d;border-color:#791f1f;color:#fff}.btn.danger:hover:not(:disabled){background:#8e2727}.btn.ghost{text-align:left}
 .btn-row{display:flex;gap:8px}.btn-row .btn{margin:0}.btn.small{padding:8px 9px;font-size:13px}
-input[type="text"],input[type="url"],input[type="file"],select{width:100%;min-height:44px;padding:11px;border:1px solid #cbd3da;border-radius:8px;background:#fff;font-size:15px}
-input:focus,select:focus,.btn:focus-visible,.choice:focus-visible{outline:3px solid rgba(24,95,165,.22);outline-offset:2px}
+input[type="text"],input[type="url"],select,textarea{width:100%;min-height:44px;padding:11px;border:1px solid #cbd3da;border-radius:8px;background:#fff;font-size:15px}
+textarea{min-height:160px;resize:vertical;font-family:Consolas,"Courier New",monospace;line-height:1.5;white-space:pre}
+input:focus,select:focus,textarea:focus,.btn:focus-visible,.choice:focus-visible{outline:3px solid rgba(24,95,165,.22);outline-offset:2px}
 input[type="range"]{width:100%;accent-color:#185fa5}
 label.form-label{display:block;font-size:13px;font-weight:700;margin:12px 0 6px}
 .notice{display:none;border-radius:8px;padding:10px 12px;margin:10px 0;font-size:13px;line-height:1.5}.notice.show{display:block}.notice.error{background:#fcebeb;color:#8d2525;border:1px solid #f1b8b8}.notice.info{background:#eaf3fb;color:#194f7b;border:1px solid #b8d8ef}
@@ -37,10 +38,11 @@ label.form-label{display:block;font-size:13px;font-weight:700;margin:12px 0 6px}
 .result-item{display:grid;grid-template-columns:1fr auto;gap:10px;padding:10px 0;border-bottom:1px solid #e5eaee;font-size:13px}.result-main{font-weight:700}.result-sub{color:#647180;margin-top:3px;white-space:pre-wrap}.badge{border-radius:6px;padding:3px 9px;font-size:12px;align-self:start}.badge.ok{background:#eaf3de}.badge.ng{background:#fcebeb}
 #qr-img{display:block;max-width:220px;width:70%;margin:12px auto;border:1px solid #dfe5ea;border-radius:8px}
 .link-box{font-size:12px;word-break:break-all;color:#47535f;background:#f7f9fb;border:1px solid #dfe5ea;border-radius:8px;padding:9px}
+.sample-box{max-height:180px;overflow:auto;white-space:pre;font-family:Consolas,"Courier New",monospace}
 body.dark{background:#0f1720;color:#e6edf3;color-scheme:dark}
 body.dark .app-title{color:#d8e9ff}
 body.dark .subtitle,body.dark .hint,body.dark .card-label,body.dark .progress-text,body.dark .stat-label,body.dark .result-sub,body.dark .meta{color:#9fb0c0}
-body.dark .panel,body.dark .card,body.dark .stat,body.dark .btn,body.dark input[type="text"],body.dark input[type="url"],body.dark input[type="file"],body.dark select{background:#17212b;border-color:#334455;color:#e6edf3}
+body.dark .panel,body.dark .card,body.dark .stat,body.dark .btn,body.dark input[type="text"],body.dark input[type="url"],body.dark select,body.dark textarea{background:#17212b;border-color:#334455;color:#e6edf3}
 body.dark .btn:hover:not(:disabled){background:#202d3a;border-color:#516273}
 body.dark .btn.primary{background:#2f7bc1;border-color:#4790d4;color:#fff}
 body.dark .btn.primary:hover:not(:disabled){background:#256dab}
@@ -71,7 +73,7 @@ body.dark #qr-img{background:#fff;border-color:#334455}
     <button class="btn theme-toggle" id="theme-toggle" aria-label="Toggle dark mode" title="Toggle dark mode">☾</button>
   </div>
   <section id="s-load" class="screen active">
-    <p class="subtitle">Create flashcards from Excel, CSV, or a spreadsheet link.</p>
+    <p class="subtitle">Create flashcards from TSV text, embedded URLs, or a spreadsheet link.</p>
     <a class="btn" href="https://chatgpt.com/g/g-6a1375f839448191a389748cd4c14ad7-manual-for-list2card" target="_blank" rel="noopener noreferrer">Manual GPTs ↗</a>
     <p class="caution"><strong>Caution:</strong> If browser translation such as Google Translate is on, turn it off before studying. Automatic translation can change the words on your flashcards.</p>
     <div id="load-notice" class="notice"></div>
@@ -84,14 +86,16 @@ body.dark #qr-img{background:#fff;border-color:#334455}
       <button class="btn primary" id="sheet-load-btn">Load Link</button>
     </div>
     <div class="panel">
-      <label class="form-label" for="file-input">File</label>
-      <input id="file-input" type="file" accept=".csv,.tsv,.txt,.xlsx,.xls">
-      <p class="hint">CSV works offline. Excel requires the import library to be available online.</p>
-      <p class="hint">Local files stay on your device, so shared URL / QR links cannot be created from offline file loads.</p>
-      <button class="btn primary" id="file-load-btn">Load File</button>
-    </div>
-    <div class="panel">
-      <p class="hint">Template: Row 1 headers / A:No. / B:Tags / C+:Card fields</p>
+      <label class="form-label" for="tsv-input">Paste TSV Table</label>
+      <textarea id="tsv-input" spellcheck="false" placeholder="No.&#9;Tags&#9;Front&#9;Back"></textarea>
+      <p class="hint">Paste a tab-separated table from GPTs or a spreadsheet. Row 1 headers / A:No. / B:Tags / C+:Card fields.</p>
+      <button class="btn primary" id="tsv-load-btn">Load Pasted Table</button>
+      <label class="form-label">Sample TSV</label>
+      <div class="link-box sample-box" id="sample-tsv-box"></div>
+      <div class="btn-row">
+        <button class="btn" id="copy-sample-btn">Copy Sample</button>
+        <button class="btn" id="download-sample-btn">Download Sample</button>
+      </div>
       <button class="btn" id="sample-load-btn">Try Sample List</button>
     </div>
   </section>
@@ -216,10 +220,10 @@ const MAX_ITEMS = 1000;
 const NONE_TEXT = "(None)";
 const SHARE_PERMISSION_HINT = "Make sure the Google Drive sharing permission is set to 'Anyone with the link: Viewer'.";
 const USAGE_LOG_ENDPOINT = "https://script.google.com/macros/s/AKfycbwmWYpnP1hfsUZLDh_L31v7xzbrI_6Y8IRdiNUf3F-dwS4DdyytWyeueTrFrzdgMVU2/exec";
-const SAMPLE_CSV = `No.,Tags,熟語,読み,意味,例文
-1,1課,気が重い,きがおもい,気分が進まない,明日の試験を考えると気が重い。
-2,1課,手を抜く,てをぬく,必要な努力を省く,大事な仕事で手を抜いてはいけない。
-3,2課,顔を出す,かおをだす,少しだけ参加する,時間があれば会議に顔を出します。`;
+const SAMPLE_TSV = `No.\tTags\t熟語\t読み\t意味\t例文
+1\t1課\t気が重い\tきがおもい\t気分が進まない\t明日の（（試験））を考えると気が重い。
+2\t1課\t手を抜く\tてをぬく\t必要な努力を省く\t大事な仕事で手を抜いてはいけない。
+3\t2課\t顔を出す\tかおをだす\t少しだけ参加する\t時間があれば会議に顔を出します。`;
 let dataset = null;
 let selectedFields = [];
 let selectedTags = [];
@@ -400,22 +404,6 @@ function normalizeRows(rows, listNameHint="Untitled"){
     setNotice("setup-notice", "More than 1000 items found. Only the first 1000 were loaded.", "info");
   }
   return { listName, tags: uniqueTags(items), fieldNames, items };
-}
-
-async function loadExcel(file){
-  if(!window.XLSX){
-    await new Promise((resolve, reject) => {
-      const script = document.createElement("script");
-      script.src = "https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js";
-      script.onload = resolve;
-      script.onerror = () => reject(new Error("Could not load the Excel import library. Save as CSV and try again."));
-      document.head.appendChild(script);
-    });
-  }
-  const buffer = await file.arrayBuffer();
-  const workbook = XLSX.read(buffer, { type: "array" });
-  const sheet = workbook.Sheets[workbook.SheetNames[0]];
-  return XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "" });
 }
 
 function googleSheetCsvUrl(url){
@@ -956,12 +944,16 @@ function showShare(){
 async function copyShareUrl(){
   const url = $("share-url").textContent.trim();
   if(!url) return;
+  await copyText(url, "share-notice");
+}
+
+async function copyText(text, noticeId="load-notice"){
   try{
     if(navigator.clipboard && window.isSecureContext){
-      await navigator.clipboard.writeText(url);
+      await navigator.clipboard.writeText(text);
     }else{
       const textarea = document.createElement("textarea");
-      textarea.value = url;
+      textarea.value = text;
       textarea.setAttribute("readonly", "");
       textarea.style.position = "fixed";
       textarea.style.left = "-9999px";
@@ -970,10 +962,22 @@ async function copyShareUrl(){
       document.execCommand("copy");
       textarea.remove();
     }
-    setNotice("share-notice", "URL copied.", "info");
+    setNotice(noticeId, "Copied.", "info");
   }catch(err){
-    setNotice("share-notice", "Could not copy automatically. Select and copy the URL manually.");
+    setNotice(noticeId, "Could not copy automatically. Select and copy manually.");
   }
+}
+
+function downloadText(filename, text){
+  const blob = new Blob([text], { type: "text/tab-separated-values;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
 }
 
 function openSourceCsv(){
@@ -1065,23 +1069,15 @@ async function loadFromSheetUrl(url){
   }
 }
 
-$("file-load-btn").onclick = async () => {
+$("tsv-load-btn").onclick = async () => {
   setNotice("load-notice", "");
-  const file = $("file-input").files[0];
-  if(!file){ setNotice("load-notice", "Choose a file."); return; }
+  const text = $("tsv-input").value.trim();
+  if(!text){ setNotice("load-notice", "Paste a TSV table."); return; }
   try{
-    let rows;
-    let csvText = "";
-    if(/\.(xlsx|xls)$/i.test(file.name)){
-      rows = await loadExcel(file);
-    }else{
-      csvText = await file.text();
-      rows = parseCsv(csvText);
-    }
     sourceUrl = "";
-    await loadDatasetFromRows(rows, "", file.name, csvText);
+    await loadDatasetFromRows(parseCsv(text), "", "Pasted Table", text);
   }catch(err){
-    setNotice("load-notice", err.message || "Load failed.");
+    setNotice("load-notice", err.message || "Pasted table load failed.");
   }
 };
 
@@ -1095,9 +1091,14 @@ $("sheet-load-btn").onclick = async () => {
 
 $("sample-load-btn").onclick = async () => {
   setNotice("load-notice", "");
-  try{ await loadDatasetFromRows(parseCsv(SAMPLE_CSV), "", "Sample Flashcards", SAMPLE_CSV); }
+  try{ await loadDatasetFromRows(parseCsv(SAMPLE_TSV), "", "Sample Flashcards", SAMPLE_TSV); }
   catch(err){ setNotice("load-notice", err.message || "Sample load failed."); }
 };
+
+$("copy-sample-btn").onclick = () => copyText(SAMPLE_TSV, "load-notice");
+$("download-sample-btn").onclick = () => downloadText("list2card_sample.tsv", SAMPLE_TSV);
+
+$("sample-tsv-box").textContent = SAMPLE_TSV;
 
 $("count-slider").oninput = e => setCount(e.target.value);
 $("count-minus-5").onclick = () => setCount(selectedCount - 5);
