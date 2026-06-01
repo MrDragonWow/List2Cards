@@ -29,6 +29,7 @@ label.form-label{display:block;font-size:13px;font-weight:700;margin:12px 0 6px}
 .meta{font-size:13px;line-height:1.7;color:#47535f}.meta strong{color:#1d2329}.meta div{display:flex;justify-content:space-between;gap:12px;border-bottom:1px solid #edf1f4;padding:3px 0}.meta div:last-child{border-bottom:0}
 .range-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.range-sliders{display:grid;grid-template-columns:1fr;gap:8px;margin-top:10px}.count-row{display:grid;grid-template-columns:auto auto 1fr auto auto;gap:6px;align-items:center}.count-display{text-align:center;font-weight:700;font-size:16px}
 .choice-list{display:flex;flex-direction:column;gap:8px;margin:10px 0}.choice{display:grid;grid-template-columns:30px 1fr;gap:10px;align-items:center;padding:12px;border:1px solid #d7dee5;border-radius:8px;background:#fff;cursor:pointer}.choice:hover{border-color:#aeb8c2}.choice.selected{border-color:#185fa5;background:#edf5fc}.choice-num{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;background:#e2e8ee;color:#55616d}.choice.selected .choice-num{background:#185fa5;color:#fff}
+.list-card{display:block;width:100%;text-align:left;padding:13px;border:1px solid #d7dee5;border-radius:8px;background:#fff;color:#1d2329;cursor:pointer;margin:8px 0}.list-card:hover{border-color:#185fa5;background:#f8fafc}.list-title{font-weight:800;margin-bottom:4px}.list-meta-line{font-size:12px;color:#647180;line-height:1.5;word-break:break-word}
 .progress-wrap{background:#e0e6eb;border-radius:4px;height:6px;margin:10px 0 6px}.progress-bar{height:6px;border-radius:4px;background:#185fa5;transition:width .2s}.progress-text{font-size:12px;color:#647180;margin-bottom:14px}
 .card{background:#fff;border:1px solid #d7dee5;border-radius:12px;min-height:260px;padding:26px 18px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:10px;margin:14px 0;overflow-wrap:anywhere;box-shadow:0 8px 24px rgba(15,23,42,.07)}
 .card-label{font-size:13px;color:#647180}.card-main{font-size:30px;font-weight:700;white-space:pre-wrap;line-height:1.35}.card-sub{font-size:13px;color:#7b8793}
@@ -55,6 +56,9 @@ body.dark .meta div,body.dark .result-item{border-bottom-color:#2a3847}
 body.dark .choice{background:#17212b;border-color:#334455;color:#e6edf3}
 body.dark .choice:hover{border-color:#516273}
 body.dark .choice.selected{background:#173454;border-color:#4a95d4}
+body.dark .list-card{background:#17212b;border-color:#334455;color:#e6edf3}
+body.dark .list-card:hover{background:#202d3a;border-color:#4a95d4}
+body.dark .list-meta-line{color:#9fb0c0}
 body.dark .choice-num{background:#293847;color:#b9c7d4}
 body.dark .choice.selected .choice-num{background:#4a95d4;color:#06111d}
 body.dark .progress-wrap{background:#2b3947}
@@ -80,6 +84,7 @@ body.dark #qr-img{background:#fff;border-color:#334455}
     <div class="panel">
       <label class="form-label" for="sheet-url">Spreadsheet Link</label>
       <input id="sheet-url" type="url" placeholder="https://docs.google.com/spreadsheets/d/...">
+      <p class="hint">Load a vocabulary list, or a class library sheet with columns: List Name / URL / Tags / Memo.</p>
       <p class="hint">The sheet must be readable as public CSV. First load requires network access.</p>
       <p class="caution"><strong>Caution:</strong> Before sharing or loading a Google Sheets CSV link, set the Google Drive sharing permission to <strong>Anyone with the link: Viewer</strong>.</p>
       <p class="hint">To understand which lists are being used, this app can record the loaded list link and load time. It does not record names, email addresses, device IDs, or answers.</p>
@@ -98,6 +103,15 @@ body.dark #qr-img{background:#fff;border-color:#334455}
       </div>
       <button class="btn" id="sample-load-btn">Try Sample List</button>
     </div>
+  </section>
+
+  <section id="s-list-index" class="screen">
+    <h2>List Library</h2>
+    <div class="panel meta" id="index-meta"></div>
+    <div id="index-notice" class="notice"></div>
+    <div id="index-list"></div>
+    <button class="btn" id="index-share-btn">Share Class URL / QR</button>
+    <button class="btn" onclick="goTo('s-load')">Load another list</button>
   </section>
 
   <section id="s-setup" class="screen">
@@ -156,6 +170,7 @@ body.dark #qr-img{background:#fff;border-color:#334455}
     </div>
     <button class="btn primary" id="start-btn">Start ▶</button>
     <button class="btn" id="share-btn">Share URL / QR</button>
+    <button class="btn" id="back-index-setup-btn">Back to List Library</button>
     <button class="btn" onclick="goTo('s-load')">Load another list</button>
   </section>
 
@@ -169,7 +184,7 @@ body.dark #qr-img{background:#fff;border-color:#334455}
       <button class="btn primary" id="copy-share-btn">Copy URL</button>
       <button class="btn" id="share-source-btn">Open Link ↗</button>
     </div>
-    <button class="btn" onclick="goTo('s-setup')">← Back</button>
+    <button class="btn" id="share-back-btn">← Back</button>
   </section>
 
   <section id="s-study" class="screen">
@@ -212,6 +227,7 @@ body.dark #qr-img{background:#fff;border-color:#334455}
       <button class="btn danger" id="retry-btn">Review ✗</button>
       <button class="btn" onclick="goTo('s-setup')">Setup</button>
     </div>
+    <button class="btn" id="back-index-result-btn">Back to List Library</button>
   </section>
 </div>
 
@@ -236,6 +252,10 @@ let results = [];
 let sourceUrl = "";
 let embeddedCsv = "";
 let embeddedListName = "";
+let listIndex = null;
+let indexSourceUrl = "";
+let shareBackScreen = "s-setup";
+let shareSourceUrl = "";
 
 const $ = id => document.getElementById(id);
 
@@ -406,6 +426,43 @@ function normalizeRows(rows, listNameHint="Untitled"){
   return { listName, tags: uniqueTags(items), fieldNames, items };
 }
 
+function normHeader(value){
+  return String(value || "").trim().toLowerCase().replace(/\s+/g, "");
+}
+
+function findHeaderIndex(header, names){
+  const normalized = header.map(normHeader);
+  const wanted = names.map(normHeader);
+  return normalized.findIndex(name => wanted.includes(name));
+}
+
+function looksLikeUrl(value){
+  return /^https?:\/\//i.test(String(value || "").trim());
+}
+
+function parseListIndexRows(rows, listNameHint="List Library"){
+  if(rows.length < 2) return null;
+  const header = rows[0].map(c => String(c || "").trim());
+  const urlIdx = findHeaderIndex(header, ["url", "link", "spreadsheeturl", "spreadsheetlink", "sheeturl", "リストurl", "url", "リンク", "共有url", "スプレッドシートurl"]);
+  if(urlIdx < 0) return null;
+  const nameIdx = findHeaderIndex(header, ["name", "title", "list", "listname", "リスト名", "名前", "タイトル", "教材名"]);
+  const tagsIdx = findHeaderIndex(header, ["tags", "tag", "タグ"]);
+  const memoIdx = findHeaderIndex(header, ["memo", "note", "notes", "description", "メモ", "説明", "備考"]);
+  const items = [];
+  rows.slice(1).forEach((row, idx) => {
+    if(!row.some(c => String(c || "").trim() !== "")) return;
+    const url = String(row[urlIdx] || "").trim();
+    if(!looksLikeUrl(url)) return;
+    const fallbackName = `List ${items.length + 1}`;
+    const name = String(nameIdx >= 0 ? row[nameIdx] || "" : "").trim() || fallbackName;
+    const tags = tagsIdx >= 0 ? splitTags(row[tagsIdx]) : [];
+    const memo = String(memoIdx >= 0 ? row[memoIdx] || "" : "").trim();
+    items.push({ name, url, tags, memo, rowNumber: idx + 2 });
+  });
+  if(!items.length) return null;
+  return { name: cleanListName(listNameHint, "List Library"), items };
+}
+
 function googleSheetCsvUrl(url){
   if(/\/spreadsheets\/d\/e\/[^/]+\/pub/.test(url) && /[?&]output=csv/.test(url)) return url;
   const match = url.match(/\/spreadsheets\/d\/([^/]+)/);
@@ -532,6 +589,70 @@ async function loadDatasetFromRows(rows, src="", listNameHint="Untitled", csvTex
   goTo("s-setup");
 }
 
+function renderListIndex(index, src=""){
+  listIndex = index;
+  indexSourceUrl = src;
+  $("index-meta").textContent = "";
+  [`Library: ${index.name}`, `Lists: ${index.items.length}`].forEach(line => {
+    const div = document.createElement("div");
+    div.textContent = line;
+    $("index-meta").appendChild(div);
+  });
+  setNotice("index-notice", "");
+  const wrap = $("index-list");
+  wrap.textContent = "";
+  index.items.forEach(item => {
+    const button = document.createElement("button");
+    button.className = "list-card";
+    const title = document.createElement("div");
+    title.className = "list-title";
+    title.textContent = item.name;
+    button.appendChild(title);
+    if(item.tags.length){
+      const tags = document.createElement("div");
+      tags.className = "list-meta-line";
+      tags.textContent = item.tags.join(", ");
+      button.appendChild(tags);
+    }
+    if(item.memo){
+      const memo = document.createElement("div");
+      memo.className = "list-meta-line";
+      memo.textContent = item.memo;
+      button.appendChild(memo);
+    }
+    const url = document.createElement("div");
+    url.className = "list-meta-line";
+    url.textContent = item.url;
+    button.appendChild(url);
+    button.onclick = () => loadFromIndexItem(item);
+    wrap.appendChild(button);
+  });
+  goTo("s-list-index");
+}
+
+function hasListLibrary(){
+  return Boolean(listIndex && listIndex.items && listIndex.items.length);
+}
+
+function updateLibraryButtons(){
+  const display = hasListLibrary() ? "block" : "none";
+  $("back-index-setup-btn").style.display = display;
+  $("back-index-result-btn").style.display = display;
+}
+
+function backToListIndex(){
+  if(hasListLibrary()) goTo("s-list-index");
+}
+
+async function loadFromIndexItem(item){
+  setNotice("index-notice", `Loading ${item.name}...`, "info");
+  try{
+    await loadFromSheetUrl(item.url, item.name);
+  }catch(err){
+    setNotice("index-notice", err.message || "List load failed.");
+  }
+}
+
 function datasetKey(){
   if(!dataset) return "";
   return "flashcards:fields:" + [dataset.listName, dataset.tags.join(","), dataset.fieldNames.join("|")].join("::");
@@ -571,6 +692,7 @@ function renderSetup(){
   setCount(selectedCount);
   renderTagList();
   updateFilterMode();
+  updateLibraryButtons();
   renderFieldList();
 }
 
@@ -855,6 +977,7 @@ function showResult(){
   renderSourceLink("result-source-actions", "result-source-url-box");
   renderResultList(results);
   $("retry-btn").disabled = !ng;
+  updateLibraryButtons();
   goTo("s-result");
 }
 
@@ -927,6 +1050,13 @@ function buildShareUrl(){
   return location.origin + location.pathname + "?" + params.toString();
 }
 
+function buildIndexShareUrl(){
+  if(!indexSourceUrl) return "";
+  const params = new URLSearchParams();
+  params.set("src", indexSourceUrl);
+  return location.origin + location.pathname + "?" + params.toString();
+}
+
 function showShare(){
   const url = buildShareUrl();
   if(!url){
@@ -935,9 +1065,26 @@ function showShare(){
     return;
   }
   setNotice("share-notice", "");
+  shareBackScreen = "s-setup";
+  shareSourceUrl = sourceUrl;
   $("share-url").textContent = url;
   $("qr-img").src = "https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=" + encodeURIComponent(url);
   $("share-source-btn").style.display = sourceUrl ? "block" : "none";
+  goTo("s-share");
+}
+
+function showIndexShare(){
+  const url = buildIndexShareUrl();
+  if(!url){
+    setNotice("index-notice", "Share URL is available when this library was loaded from a spreadsheet link.");
+    return;
+  }
+  setNotice("share-notice", "");
+  shareBackScreen = "s-list-index";
+  shareSourceUrl = indexSourceUrl;
+  $("share-url").textContent = url;
+  $("qr-img").src = "https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=" + encodeURIComponent(url);
+  $("share-source-btn").style.display = "block";
   goTo("s-share");
 }
 
@@ -983,6 +1130,11 @@ function downloadText(filename, text){
 function openSourceCsv(){
   if(!sourceUrl) return;
   window.open(sourceUrl, "_blank", "noopener,noreferrer");
+}
+
+function openShareSource(){
+  if(!shareSourceUrl) return;
+  window.open(shareSourceUrl, "_blank", "noopener,noreferrer");
 }
 
 function renderSourceLink(containerId, boxId){
@@ -1047,19 +1199,28 @@ async function initFromQuery(){
   }
 }
 
-async function loadFromSheetUrl(url){
+async function handleSheetRows(rows, url, listName, options={}){
+  const index = parseListIndexRows(rows, listName);
+  if(index && !options.forceDataset){
+    renderListIndex(index, url);
+    return;
+  }
+  await loadDatasetFromRows(rows, url, options.listNameOverride || listName);
+}
+
+async function loadFromSheetUrl(url, listNameOverride=""){
   const csvUrl = googleSheetCsvUrl(url);
   try{
     const res = await fetch(csvUrl);
     if(!res.ok) throw new Error("Could not load the spreadsheet. " + SHARE_PERMISSION_HINT);
-    const listName = cleanListName(contentDispositionFileName(res.headers.get("content-disposition")), "Spreadsheet");
+    const listName = listNameOverride || cleanListName(contentDispositionFileName(res.headers.get("content-disposition")), "Spreadsheet");
     const text = await res.text();
-    await loadDatasetFromRows(parseCsv(text), url, listName);
+    await handleSheetRows(parseCsv(text), url, listName, { listNameOverride });
   }catch(fetchError){
     if(!/docs\.google\.com\/spreadsheets/.test(url)) throw fetchError;
     try{
       const rows = await loadGoogleSheetViaJsonp(url);
-      await loadDatasetFromRows(rows, url, "Spreadsheet");
+      await handleSheetRows(rows, url, listNameOverride || "Spreadsheet", { listNameOverride });
     }catch(jsonpError){
       if(/\/spreadsheets\/d\/e\//.test(url)){
         throw new Error("This published CSV URL could not be read from the browser. Try the normal sheet share URL, or download the CSV and load it as a file. " + SHARE_PERMISSION_HINT);
@@ -1114,10 +1275,14 @@ $("theme-toggle").onclick = toggleTheme;
 $("start-btn").onclick = startStudy;
 $("start-top-btn").onclick = startStudy;
 $("share-btn").onclick = showShare;
+$("index-share-btn").onclick = showIndexShare;
+$("back-index-setup-btn").onclick = backToListIndex;
+$("back-index-result-btn").onclick = backToListIndex;
 $("open-source-btn").onclick = openSourceCsv;
-$("share-source-btn").onclick = openSourceCsv;
+$("share-source-btn").onclick = openShareSource;
 $("copy-share-btn").onclick = copyShareUrl;
 $("result-open-source-btn").onclick = openSourceCsv;
+$("share-back-btn").onclick = () => goTo(shareBackScreen);
 $("answer-btn").onclick = showAnswer;
 $("ok-btn").onclick = () => judge(true);
 $("ng-btn").onclick = () => judge(false);
