@@ -397,8 +397,15 @@ function normalizeRows(rows, listNameHint="Untitled"){
   if(header.length < 4) throw new Error("Columns A-B and at least two card fields from column C are required.");
   if(!header[0]) throw new Error("Column A needs a No. header.");
   if(!header[1]) throw new Error("Column B needs a Tags header.");
-  const fieldNames = header.slice(2).map(c => String(c || "").trim()).filter(Boolean);
+  const rawFieldHeaders = header.slice(2);
+  let lastFieldHeader = rawFieldHeaders.length - 1;
+  while(lastFieldHeader >= 0 && !rawFieldHeaders[lastFieldHeader]) lastFieldHeader--;
+  const fieldColumns = rawFieldHeaders.slice(0, lastFieldHeader + 1).map((name, idx) => ({ name, index: idx + 2 }));
+  if(fieldColumns.some(col => !col.name)) throw new Error("Card field headers from column C onward cannot be blank.");
+  const fieldNames = fieldColumns.map(col => col.name);
   if(fieldNames.length < 2) throw new Error("Add at least two headers from column C onward.");
+  const duplicateField = fieldNames.find((name, idx) => fieldNames.indexOf(name) !== idx);
+  if(duplicateField) throw new Error(`Card field header "${duplicateField}" is duplicated.`);
 
   const listName = cleanListName(listNameHint);
   const seen = new Set();
@@ -411,8 +418,8 @@ function normalizeRows(rows, listNameHint="Untitled"){
     if(seen.has(number)) throw new Error(`Column A No. ${number} is duplicated.`);
     seen.add(number);
     const fields = {};
-    fieldNames.forEach((name, fieldIdx) => {
-      fields[name] = String(r[fieldIdx + 2] || "").trim();
+    fieldColumns.forEach(col => {
+      fields[col.name] = String(r[col.index] || "").trim();
     });
     items.push({ number, tags: splitTags(r[1]), fields });
   });
@@ -443,9 +450,11 @@ function looksLikeUrl(value){
 function parseListIndexRows(rows, listNameHint="List Library"){
   if(rows.length < 2) return null;
   const header = rows[0].map(c => String(c || "").trim());
+  if(["no", "no.", "number", "番号"].includes(normHeader(header[0]))) return null;
   const urlIdx = findHeaderIndex(header, ["url", "link", "spreadsheeturl", "spreadsheetlink", "sheeturl", "リストurl", "url", "リンク", "共有url", "スプレッドシートurl"]);
   if(urlIdx < 0) return null;
   const nameIdx = findHeaderIndex(header, ["name", "title", "list", "listname", "リスト名", "名前", "タイトル", "教材名"]);
+  if(nameIdx < 0) return null;
   const tagsIdx = findHeaderIndex(header, ["tags", "tag", "タグ"]);
   const memoIdx = findHeaderIndex(header, ["memo", "note", "notes", "description", "メモ", "説明", "備考"]);
   const items = [];
@@ -1040,9 +1049,9 @@ function buildShareUrl(){
     params.set("data", embeddedCsv);
     params.set("name", embeddedListName || "List2Card List");
   }
-  params.set("fields", selectedFields.join("|"));
+  params.set("fields", JSON.stringify(selectedFields));
   params.set("mode", currentFilterMode());
-  params.set("tags", selectedTags.join("|"));
+  params.set("tags", JSON.stringify(selectedTags));
   params.set("min", $("min-no").value);
   params.set("max", $("max-no").value);
   params.set("count", String(selectedCount));
@@ -1149,9 +1158,18 @@ function renderSourceLink(containerId, boxId){
   box.textContent = sourceUrl;
 }
 
+function parseListParam(value){
+  if(!value) return [];
+  try{
+    const parsed = JSON.parse(value);
+    if(Array.isArray(parsed)) return parsed.map(item => String(item));
+  }catch(e){}
+  return String(value).split("|").filter(Boolean);
+}
+
 function applyQuerySettings(){
   const params = new URLSearchParams(location.search);
-  const fields = (params.get("fields") || "").split("|").filter(Boolean).filter(f => dataset.fieldNames.includes(f));
+  const fields = parseListParam(params.get("fields")).filter(f => dataset.fieldNames.includes(f));
   if(fields.length >= 2){
     selectedFields = fields;
     saveFieldSelection();
@@ -1161,7 +1179,7 @@ function applyQuerySettings(){
   if(params.get("max")) $("max-no").value = params.get("max");
   if(params.get("min") || params.get("max")) syncSlidersFromNoInputs();
   if(params.has("tags")){
-    selectedTags = (params.get("tags") || "").split("|").filter(Boolean).filter(tag => dataset.tags.includes(tag));
+    selectedTags = parseListParam(params.get("tags")).filter(tag => dataset.tags.includes(tag));
     renderTagList();
   }
   if(params.has("mode")){
