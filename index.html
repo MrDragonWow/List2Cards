@@ -43,6 +43,7 @@ label.form-label{display:block;font-size:13px;font-weight:700;margin:12px 0 6px}
 #qr-img{display:block;max-width:220px;width:70%;margin:12px auto;border:1px solid #dfe5ea;border-radius:8px}
 .link-box{font-size:12px;word-break:break-all;color:#47535f;background:#f7f9fb;border:1px solid #dfe5ea;border-radius:8px;padding:9px}
 .sample-box{max-height:180px;overflow:auto;white-space:pre;font-family:Consolas,"Courier New",monospace}
+.confirm-overlay{position:fixed;inset:0;z-index:100;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(15,23,32,.58)}.confirm-overlay.show{display:flex}.confirm-dialog{width:min(100%,400px);background:#fff;border:1px solid #d7dee5;border-radius:8px;padding:20px;box-shadow:0 18px 48px rgba(15,23,42,.22)}.confirm-dialog h2{margin-top:0}.confirm-dialog p{font-size:14px;line-height:1.6;color:#47535f}.confirm-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:16px}.confirm-actions .btn{margin:0}
 body.dark{background:#0f1720;color:#e6edf3;color-scheme:dark}
 body.dark .app-header{background:rgba(15,23,32,.94)}
 body.dark .app-title{color:#d8e9ff}
@@ -83,6 +84,7 @@ body.dark .link-box{background:#121a23;border-color:#334455;color:#b9c7d4}
 body.dark .info-box,body.dark .count-value{background:#121a23;border-color:#334455;color:#b9c7d4}
 body.dark .tag-chip{background:#17212b;border-color:#334455;color:#e6edf3}
 body.dark .machine-feedback.ok{color:#8ed992}body.dark .machine-feedback.ng{color:#ffaaa9}body.dark .result-input{color:#9fb0c0}body.dark .badge.accepted{background:#16424a;color:#9be5ed}
+body.dark .confirm-dialog{background:#17212b;border-color:#5b7084}body.dark .confirm-dialog p{color:#b9c7d4}
 body.dark #qr-img{background:#fff;border-color:#334455}
 @media (max-width:420px){#app{padding:14px 12px 22px}.app-header{grid-template-columns:132px 1fr 132px;gap:4px}.ask-gpt{width:80px;min-width:80px;padding:0 6px;font-size:11px}.gpt-mark{width:23px;height:23px;min-width:23px}.btn-row{flex-direction:column}.stat-row{grid-template-columns:1fr}.card-main{font-size:26px}.count-row{grid-template-columns:1fr 1fr}.count-row input{grid-column:1 / -1;grid-row:1}}
 </style>
@@ -253,6 +255,16 @@ body.dark #qr-img{background:#fff;border-color:#334455}
       <button class="btn icon-btn" id="result-setup-btn" aria-label="Setting" title="Setting">⚙</button>
     </div>
   </section>
+  <div class="confirm-overlay" id="reset-confirm" role="dialog" aria-modal="true" aria-labelledby="reset-confirm-title">
+    <div class="confirm-dialog">
+      <h2 id="reset-confirm-title">Return to settings?</h2>
+      <p>Your accumulated Next cards progress will be reset.</p>
+      <div class="confirm-actions">
+        <button class="btn" id="reset-cancel-btn">Cancel</button>
+        <button class="btn danger" id="reset-confirm-btn">Reset &amp; Return</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -271,6 +283,8 @@ let selectedTags = [];
 let selectedCount = 1;
 let studyQueue = [];
 let lastStudyItems = [];
+let studyRunUsedNumbers = new Set();
+let studyRunBatchSize = 0;
 let currentCardIndex = 0;
 let currentAnswerIndex = -1;
 let showingAnswer = false;
@@ -324,10 +338,35 @@ function updateTopBar(){
   $("top-back-btn").classList.toggle("disabled", disabled);
 }
 
+function resetStudyRun(){
+  studyRunUsedNumbers.clear();
+  studyRunBatchSize = 0;
+  lastStudyItems = [];
+}
+
+function closeResetConfirm(){
+  $("reset-confirm").classList.remove("show");
+}
+
+function requestSetupReturn(){
+  if(!studyRunUsedNumbers.size){
+    goTo("s-setup");
+    return;
+  }
+  $("reset-confirm").classList.add("show");
+  $("reset-cancel-btn").focus();
+}
+
+function confirmSetupReturn(){
+  closeResetConfirm();
+  resetStudyRun();
+  goTo("s-setup");
+}
+
 function topBack(){
   if(currentScreen === "s-load" || currentScreen === "s-list-index") return;
   if(currentScreen === "s-study" || currentScreen === "s-result" || currentScreen === "s-share"){
-    goTo("s-setup");
+    requestSetupReturn();
   }else if(currentScreen === "s-setup"){
     goTo(hasListLibrary() ? "s-list-index" : "s-load");
   }else{
@@ -766,6 +805,8 @@ async function loadDatasetFromRows(rows, src="", listNameHint="Untitled", csvTex
   selectedFields = restoreFieldSelection();
   selectedTextFields = [];
   selectedTags = dataset.tags.slice();
+  studyRunUsedNumbers.clear();
+  studyRunBatchSize = 0;
   $("filter-mode").value = dataset.tags.length ? "tags" : "number";
   selectedCount = Math.min(15, dataset.items.length);
   renderSetup();
@@ -1033,7 +1074,7 @@ function buildStudyQueue(items){
   return queue;
 }
 
-function startStudy(itemsOverride=null){
+function startStudy(itemsOverride=null, options={}){
   setNotice("setup-notice", "");
   if(selectedFields.length < 2){
     setNotice("setup-notice", "Select at least 2 fields.");
@@ -1049,7 +1090,14 @@ function startStudy(itemsOverride=null){
     setNotice("setup-notice", "No answer data found in the selected fields.");
     return;
   }
-  lastStudyItems = items.slice();
+  if(!options.continueRun){
+    studyRunUsedNumbers.clear();
+    studyRunBatchSize = selectedCount;
+  }else if(!studyRunBatchSize){
+    studyRunBatchSize = selectedCount;
+  }
+  lastStudyItems = studyQueue.map(card => card.item);
+  lastStudyItems.forEach(item => studyRunUsedNumbers.add(item.number));
   results = [];
   currentCardIndex = 0;
   currentAnswerIndex = -1;
@@ -1373,21 +1421,23 @@ function retryWrong(){
 }
 
 function redoSameCards(){
-  if(lastStudyItems.length) startStudy(lastStudyItems.slice());
+  if(lastStudyItems.length) startStudy(lastStudyItems.slice(), { continueRun: true });
 }
 
 function nextCards(){
-  const used = new Set(lastStudyItems.map(item => item.number));
-  let remaining = filteredItems().filter(item => !used.has(item.number));
+  let remaining = filteredItems().filter(item => !studyRunUsedNumbers.has(item.number));
   if($("order-select").value === "random") remaining = shuffle(remaining);
-  startStudy(remaining.slice(0, selectedCount));
+  startStudy(remaining.slice(0, studyRunBatchSize || selectedCount), { continueRun: true });
 }
 
 function updateNextCardsButton(){
   if(!$("next-cards-btn") || !dataset) return;
-  const used = new Set(lastStudyItems.map(item => item.number));
-  const remaining = filteredItems().filter(item => !used.has(item.number)).length;
-  $("next-cards-btn").textContent = `Next ${Math.min(selectedCount, remaining)} cards⇒`;
+  const remaining = filteredItems().filter(item => !studyRunUsedNumbers.has(item.number)).length;
+  const batchSize = studyRunBatchSize || selectedCount;
+  const nextCount = Math.min(batchSize, remaining);
+  $("next-cards-btn").textContent = remaining > 0 && remaining < batchSize
+    ? `Last ${remaining} cards⇒`
+    : `Next ${nextCount} cards⇒`;
   $("next-cards-btn").disabled = remaining === 0;
 }
 
@@ -1788,7 +1838,10 @@ $("index-load-another-btn").onclick = () => goTo("s-load");
 $("open-source-btn").onclick = openSourceCsv;
 $("share-source-btn").onclick = openShareSource;
 $("copy-share-btn").onclick = copyShareUrl;
-$("share-back-btn").onclick = () => goTo(shareBackScreen);
+$("share-back-btn").onclick = () => {
+  if(shareBackScreen === "s-setup") requestSetupReturn();
+  else goTo(shareBackScreen);
+};
 $("answer-btn").onclick = showAnswer;
 $("check-answer-btn").onclick = checkTextAnswer;
 $("machine-ok-btn").onclick = () => recordMachineResult(true);
@@ -1801,7 +1854,12 @@ $("skip-btn").onclick = skipTask;
 $("retry-btn").onclick = retryWrong;
 $("redo-btn").onclick = redoSameCards;
 $("next-cards-btn").onclick = nextCards;
-$("result-setup-btn").onclick = () => goTo("s-setup");
+$("result-setup-btn").onclick = requestSetupReturn;
+$("reset-cancel-btn").onclick = closeResetConfirm;
+$("reset-confirm-btn").onclick = confirmSetupReturn;
+$("reset-confirm").onclick = event => {
+  if(event.target === $("reset-confirm")) closeResetConfirm();
+};
 
 document.querySelectorAll(".info-toggle").forEach(button => {
   button.onclick = () => {
@@ -1818,6 +1876,10 @@ $("text-answer-input").onkeydown = event => {
 };
 
 document.addEventListener("keydown", event => {
+  if(event.key === "Escape" && $("reset-confirm").classList.contains("show")){
+    closeResetConfirm();
+    return;
+  }
   if(["INPUT", "SELECT", "TEXTAREA"].includes(document.activeElement.tagName)) return;
   if($("s-study").classList.contains("active")){
     if(event.key === "Enter" || event.key === " "){
@@ -1830,7 +1892,7 @@ document.addEventListener("keydown", event => {
     }else if(event.key === "ArrowRight"){
       if($("skip-actions").style.display !== "none") skipTask();
     }else if(event.key === "Escape"){
-      goTo("s-setup");
+      requestSetupReturn();
     }
   }
 });
