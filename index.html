@@ -9,9 +9,9 @@
 body{font-family:"Hiragino Sans","Meiryo",sans-serif;background:#eef2f5;color:#1d2329;min-height:100vh}
 #app{max-width:560px;margin:0 auto;padding:18px 16px 24px}
 .screen{display:none}.screen.active{display:block}
-.app-header{position:sticky;top:0;z-index:10;display:grid;grid-template-columns:84px 1fr 84px;align-items:center;gap:8px;background:rgba(238,242,245,.94);backdrop-filter:blur(10px);padding:8px 0 10px;margin-bottom:4px}
+.app-header{position:sticky;top:0;z-index:10;display:grid;grid-template-columns:142px 1fr 142px;align-items:center;gap:8px;background:rgba(238,242,245,.94);backdrop-filter:blur(10px);padding:8px 0 10px;margin-bottom:4px}
 .app-title{font-size:22px;font-weight:900;letter-spacing:0;color:#12395c;text-align:center}
-.top-actions{display:flex;justify-content:flex-end;gap:6px}.icon-btn{display:inline-flex;align-items:center;justify-content:center;width:38px;min-width:38px;height:38px;min-height:38px;margin:0;padding:0;border:0;background:transparent;box-shadow:none;border-radius:999px;text-decoration:none;font-size:18px}.icon-btn:hover:not(:disabled){background:rgba(24,95,165,.09);border:0}.icon-btn.disabled{opacity:.35;cursor:not-allowed;pointer-events:none}
+.top-actions{display:flex;justify-content:flex-end;align-items:center;gap:6px;min-width:0}.icon-btn{display:inline-flex;align-items:center;justify-content:center;width:38px;min-width:38px;height:38px;min-height:38px;margin:0;padding:0;border:0;background:transparent;box-shadow:none;border-radius:999px;text-decoration:none;font-size:18px}.icon-btn:hover:not(:disabled){background:rgba(24,95,165,.09);border:0}.icon-btn.disabled{opacity:.35;cursor:not-allowed;pointer-events:none}.top-actions .icon-btn,.ask-gpt{height:46px;min-height:46px;border:1px solid #cbd3da;border-radius:8px;background:#fff;flex-shrink:0}.top-actions .icon-btn{width:46px;min-width:46px}.top-actions .icon-btn:hover:not(:disabled),.ask-gpt:hover{background:#f8fafc;border-color:#aeb8c2}.ask-gpt{display:inline-flex;align-items:center;justify-content:center;gap:5px;width:90px;min-width:90px;padding:0 9px;color:#12395c;text-decoration:none;font-size:12px;font-weight:800;white-space:nowrap}.ask-gpt:hover{color:#185fa5}.gpt-mark{display:block;width:25px;height:25px;min-width:25px;border-radius:6px}
 h1{font-size:24px;font-weight:800;margin:10px 0 4px;letter-spacing:0}h2{font-size:19px;font-weight:800;margin:8px 0 12px}
 .subtitle,.hint{font-size:13px;color:#647180;line-height:1.6}.hint{margin:6px 0 12px}
 .panel{background:#fff;border:1px solid #dfe5ea;border-radius:8px;padding:15px;margin:12px 0;box-shadow:0 1px 2px rgba(15,23,42,.04)}
@@ -28,18 +28,18 @@ label.form-label{display:block;font-size:13px;font-weight:700;margin:12px 0 6px}
 .caution{border:1px solid #f0c36d;background:#fff8e5;color:#6a4a00;border-radius:8px;padding:10px 12px;font-size:13px;line-height:1.5;margin:10px 0 12px}
 .meta{font-size:13px;line-height:1.7;color:#47535f}.meta strong{color:#1d2329}.meta div{display:flex;justify-content:space-between;gap:12px;border-bottom:1px solid #edf1f4;padding:3px 0}.meta div:last-child{border-bottom:0}
 .range-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.range-sliders{display:grid;grid-template-columns:1fr;gap:8px;margin-top:10px}.count-row{display:grid;grid-template-columns:auto auto 1fr auto auto;gap:6px;align-items:center}.count-display{text-align:center;font-weight:700;font-size:16px}
-.choice-list{display:flex;flex-direction:column;gap:8px;margin:10px 0}.choice{display:grid;grid-template-columns:30px 1fr;gap:10px;align-items:center;padding:12px;border:1px solid #d7dee5;border-radius:8px;background:#fff;cursor:pointer}.choice:hover{border-color:#aeb8c2}.choice.selected{border-color:#185fa5;background:#edf5fc}.choice-num{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;background:#e2e8ee;color:#55616d}.choice.selected .choice-num{background:#185fa5;color:#fff}
+.choice-list{display:flex;flex-direction:column;gap:8px;margin:10px 0}.choice{display:grid;grid-template-columns:30px minmax(0,1fr) auto;gap:10px;align-items:center;padding:12px;border:1px solid #d7dee5;border-radius:8px;background:#fff;cursor:pointer}.choice:hover{border-color:#aeb8c2}.choice.selected{border-color:#185fa5;background:#edf5fc}.choice-num{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;background:#e2e8ee;color:#55616d}.choice.selected .choice-num{background:#185fa5;color:#fff}.text-mode-toggle{width:auto;min-width:58px;min-height:36px;margin:0;padding:7px 9px;font-size:12px;background:#eef2f5;border-color:#aeb8c2;color:#47535f}.text-mode-toggle:hover:not(:disabled){background:#dce5ec;border-color:#7f8d99;color:#1d2329}.text-mode-toggle.active{background:#185fa5;border-color:#0c447c;color:#fff}.text-mode-toggle.active:hover:not(:disabled){background:#124f8c;border-color:#093963;color:#fff}
 .list-card{display:block;width:100%;text-align:left;padding:13px;border:1px solid #d7dee5;border-radius:8px;background:#fff;color:#1d2329;cursor:pointer;margin:8px 0}.list-card:hover{border-color:#185fa5;background:#f8fafc}.list-title{font-weight:800;margin-bottom:4px}.list-meta-line{font-size:12px;color:#647180;line-height:1.5;word-break:break-word}
-.info-box{display:none;background:#f7f9fb;border:1px solid #dfe5ea;border-radius:8px;padding:10px 12px;margin:8px 0 12px;font-size:13px;line-height:1.5;color:#47535f}.info-box.show{display:block}.info-toggle{width:auto;min-width:38px;min-height:38px;border-radius:999px;margin:8px auto 0}
+.info-box{display:none;background:#f7f9fb;border:1px solid #dfe5ea;border-radius:8px;padding:10px 12px;margin:0 0 4px;font-size:13px;line-height:1.5;color:#47535f}.info-box.show{display:block}.action-with-tip{display:grid;grid-template-columns:minmax(0,1fr) 38px;gap:8px;align-items:center;margin:8px 0}.action-with-tip>.btn{margin:0}.action-with-tip>.info-box{grid-column:1/-1}.info-toggle{width:38px;min-width:38px;min-height:38px;border-radius:999px;margin:0;padding:0}
 .list-card .list-meta-line{display:none}.setup-actions{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center}.settings-toggle{margin:8px 0}.settings-body{display:none}.settings-body.show{display:block}#filter-mode{display:none}.list-name{font-size:22px;font-weight:900;text-align:center;margin:10px 0}.start-no-line{display:flex;align-items:center;justify-content:space-between;gap:12px}.start-no-value{font-size:18px;font-weight:900;color:#185fa5}.tag-chips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}.tag-chip{display:inline-flex;align-items:center;gap:5px;border:1px solid #d7dee5;border-radius:999px;padding:7px 10px;font-size:13px;background:#fff}.tag-chip input{width:auto;min-height:0}.count-controls{display:grid;grid-template-columns:48px 1fr 48px 64px;gap:8px;align-items:center}.count-value{min-height:46px;display:flex;align-items:center;justify-content:center;border:1px solid #d7dee5;border-radius:8px;background:#f7f9fb;font-weight:900}.settings-footer{display:flex;justify-content:center;gap:14px;margin-top:12px}
-.study-actions{display:grid;grid-template-columns:52px 1fr 1fr;gap:8px}.result-actions{display:grid;grid-template-columns:repeat(3,1fr) auto;gap:8px;margin:12px 0}.stat{cursor:pointer;position:relative}.stat-more{font-size:18px;color:#647180;margin-top:4px}.result-list-hidden{display:none}
+.study-actions{display:grid;grid-template-columns:52px 1fr 1fr;gap:8px}.text-answer-actions{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center}.text-answer-actions input{margin:0}.text-answer-actions .btn{width:auto;min-width:84px;margin:0}.machine-actions{display:grid;gap:8px}.machine-correct{grid-template-columns:1fr}.machine-wrong{grid-template-columns:1fr 1fr 38px;align-items:center}.machine-wrong .btn{margin:0}.machine-help{margin:0}.machine-feedback{font-size:13px;font-weight:800;text-align:center;margin:8px 0}.machine-feedback.ok{color:#3b6d11}.machine-feedback.ng{color:#a32d2d}.result-actions{display:grid;grid-template-columns:repeat(3,1fr) auto;gap:8px;margin:12px 0}.stat{cursor:pointer;position:relative}.stat-more{font-size:18px;color:#647180;margin-top:4px}.result-list-hidden{display:none}
 .progress-wrap{background:#e0e6eb;border-radius:4px;height:6px;margin:10px 0 6px}.progress-bar{height:6px;border-radius:4px;background:#185fa5;transition:width .2s}.progress-text{font-size:12px;color:#647180;margin-bottom:14px}
 .card{background:#fff;border:1px solid #d7dee5;border-radius:12px;min-height:260px;padding:26px 18px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:10px;margin:14px 0;overflow-wrap:anywhere;box-shadow:0 8px 24px rgba(15,23,42,.07)}
 .card-label{font-size:13px;color:#647180}.card-main{font-size:30px;font-weight:700;white-space:pre-wrap;line-height:1.35}.card-sub{font-size:13px;color:#7b8793}
 .emphasis{color:#c62828;font-weight:900}
 .next-field{font-size:13px;color:#185fa5;font-weight:700}
 .stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0}.stat{background:#fff;border:1px solid #dfe5ea;border-radius:8px;padding:12px;text-align:center}.stat.active{border-color:#185fa5;background:#edf5fc}.stat-label{font-size:12px;color:#647180}.stat-num{font-size:24px;font-weight:700}.ok{color:#3b6d11}.ng{color:#a32d2d}
-.result-item{display:grid;grid-template-columns:1fr auto;gap:10px;padding:10px 0;border-bottom:1px solid #e5eaee;font-size:13px}.result-main{font-weight:700}.result-sub{color:#647180;margin-top:3px;white-space:pre-wrap}.badge{border-radius:6px;padding:3px 9px;font-size:12px;align-self:start}.badge.ok{background:#eaf3de}.badge.ng{background:#fcebeb}
+.result-item{display:grid;grid-template-columns:1fr auto;gap:10px;padding:10px 0;border-bottom:1px solid #e5eaee;font-size:13px}.result-main{font-weight:700}.result-sub{color:#647180;margin-top:3px;white-space:pre-wrap}.result-input{color:#47535f;margin-top:3px;white-space:pre-wrap}.badge{border-radius:6px;padding:3px 9px;font-size:12px;align-self:start}.badge.ok{background:#eaf3de}.badge.ng{background:#fcebeb}.badge.accepted{background:#dff3f5;color:#14606a}
 #qr-img{display:block;max-width:220px;width:70%;margin:12px auto;border:1px solid #dfe5ea;border-radius:8px}
 .link-box{font-size:12px;word-break:break-all;color:#47535f;background:#f7f9fb;border:1px solid #dfe5ea;border-radius:8px;padding:9px}
 .sample-box{max-height:180px;overflow:auto;white-space:pre;font-family:Consolas,"Courier New",monospace}
@@ -58,6 +58,9 @@ body.dark .btn.danger{background:#b84242;border-color:#ef8585;color:#fff}
 body.dark .btn.danger:hover:not(:disabled){background:#d05252;border-color:#ffaaa9;color:#fff}
 body.dark .icon-btn{background:transparent;border-color:transparent}
 body.dark .icon-btn:hover:not(:disabled){background:rgba(125,186,240,.16);border-color:transparent}
+body.dark .top-actions .icon-btn,body.dark .ask-gpt{background:#263443;border-color:#5b7084}
+body.dark .top-actions .icon-btn:hover:not(:disabled),body.dark .ask-gpt:hover{background:#324557;border-color:#7d95aa}
+body.dark .ask-gpt{color:#d8e9ff}body.dark .ask-gpt:hover{color:#7dbaf0}
 body.dark .caution{background:#2b2414;border-color:#81611e;color:#f7d889}
 body.dark .notice.error{background:#351c1f;color:#ffc9cf;border-color:#7f333c}
 body.dark .notice.info{background:#14283a;color:#b9dcfb;border-color:#2e5b80}
@@ -65,6 +68,7 @@ body.dark .meta div,body.dark .result-item{border-bottom-color:#2a3847}
 body.dark .choice{background:#17212b;border-color:#334455;color:#e6edf3}
 body.dark .choice:hover{border-color:#516273}
 body.dark .choice.selected{background:#173454;border-color:#4a95d4}
+body.dark .text-mode-toggle{background:#263443;border-color:#5b7084;color:#d8e3ec}body.dark .text-mode-toggle:hover:not(:disabled){background:#3a4c5e;border-color:#8ba0b3;color:#fff}body.dark .text-mode-toggle.active{background:#2f7bc1;border-color:#67a9e4;color:#fff}body.dark .text-mode-toggle.active:hover:not(:disabled){background:#3f8bd2;border-color:#8fc4ef;color:#fff}
 body.dark .stat.active{background:#173454;border-color:#4a95d4}
 body.dark .list-card{background:#17212b;border-color:#334455;color:#e6edf3}
 body.dark .list-card:hover{background:#202d3a;border-color:#4a95d4}
@@ -78,8 +82,9 @@ body.dark .next-field{color:#7dbaf0}
 body.dark .link-box{background:#121a23;border-color:#334455;color:#b9c7d4}
 body.dark .info-box,body.dark .count-value{background:#121a23;border-color:#334455;color:#b9c7d4}
 body.dark .tag-chip{background:#17212b;border-color:#334455;color:#e6edf3}
+body.dark .machine-feedback.ok{color:#8ed992}body.dark .machine-feedback.ng{color:#ffaaa9}body.dark .result-input{color:#9fb0c0}body.dark .badge.accepted{background:#16424a;color:#9be5ed}
 body.dark #qr-img{background:#fff;border-color:#334455}
-@media (max-width:420px){#app{padding:14px 12px 22px}.btn-row{flex-direction:column}.stat-row{grid-template-columns:1fr}.card-main{font-size:26px}.count-row{grid-template-columns:1fr 1fr}.count-row input{grid-column:1 / -1;grid-row:1}}
+@media (max-width:420px){#app{padding:14px 12px 22px}.app-header{grid-template-columns:132px 1fr 132px;gap:4px}.ask-gpt{width:80px;min-width:80px;padding:0 6px;font-size:11px}.gpt-mark{width:23px;height:23px;min-width:23px}.btn-row{flex-direction:column}.stat-row{grid-template-columns:1fr}.card-main{font-size:26px}.count-row{grid-template-columns:1fr 1fr}.count-row input{grid-column:1 / -1;grid-row:1}}
 </style>
 </head>
 <body>
@@ -89,7 +94,7 @@ body.dark #qr-img{background:#fff;border-color:#334455}
     <div class="app-title">List2Card</div>
     <div class="top-actions">
       <button class="btn icon-btn" id="theme-toggle" aria-label="Toggle dark mode" title="Toggle dark mode">☾</button>
-      <a class="btn icon-btn" href="https://chatgpt.com/g/g-6a1375f839448191a389748cd4c14ad7-manual-for-list2card" target="_blank" rel="noopener noreferrer" aria-label="Manual" title="Manual">?</a>
+      <a class="ask-gpt" href="https://chatgpt.com/g/g-6a1375f839448191a389748cd4c14ad7-manual-for-list2card" target="_blank" rel="noopener noreferrer" aria-label="Ask GPTs" title="Ask GPTs"><span>ask to</span><img class="gpt-mark" src="https://chatgpt.com/favicon.ico" alt=""></a>
     </div>
   </div>
   <section id="s-load" class="screen active">
@@ -98,25 +103,31 @@ body.dark #qr-img{background:#fff;border-color:#334455}
     <div class="panel">
       <label class="form-label" for="sheet-url">Spreadsheet Link</label>
       <input id="sheet-url" type="url" placeholder="https://docs.google.com/spreadsheets/d/...">
-      <button class="btn primary" id="sheet-load-btn">Load Link</button>
-      <button class="btn info-toggle" data-info="sheet-info">?</button>
-      <div class="info-box" id="sheet-info">Load a vocabulary list, or a class library sheet. Put the title in A1. Use B1 to identify the sheet type: Tags for a vocabulary list, or URL / Link for a class library. Consecutive Tags columns are all read as tags, and card fields start after them. Make sure Google Drive sharing is set to Anyone with the link: Viewer.</div>
+      <div class="action-with-tip">
+        <button class="btn primary" id="sheet-load-btn">Load Link</button>
+        <button class="btn info-toggle" data-info="sheet-info" aria-label="Spreadsheet link help">?</button>
+        <div class="info-box" id="sheet-info">Load a vocabulary list, or a class library sheet. Put the title in A1. Use B1 to identify the sheet type: Tags for a vocabulary list, or URL / Link for a class library. Consecutive Tags columns are all read as tags, and card fields start after them. Make sure Google Drive sharing is set to Anyone with the link: Viewer.</div>
+      </div>
     </div>
     <div class="panel">
       <label class="form-label" for="tsv-input">Paste TSV Table</label>
       <textarea id="tsv-input" spellcheck="false" placeholder="List name&#9;Tags&#9;Tags&#9;Front&#9;Back"></textarea>
-      <button class="btn primary" id="tsv-load-btn">Load Pasted Table</button>
-      <button class="btn info-toggle" data-info="tsv-info">?</button>
-      <div class="info-box" id="tsv-info">Paste a tab-separated table from GPTs or a spreadsheet. Put the title in A1. Consecutive Tags columns from B1 are read as tags, and card fields start after them.</div>
+      <div class="action-with-tip">
+        <button class="btn primary" id="tsv-load-btn">Load Pasted Table</button>
+        <button class="btn info-toggle" data-info="tsv-info" aria-label="Pasted table help">?</button>
+        <div class="info-box" id="tsv-info">Paste a tab-separated table from GPTs or a spreadsheet. Put the title in A1. Consecutive Tags columns from B1 are read as tags, and card fields start after them.</div>
+      </div>
       <label class="form-label">Sample TSV</label>
       <div class="link-box sample-box" id="sample-tsv-box"></div>
       <div class="btn-row">
         <button class="btn" id="copy-sample-btn">Copy Sample</button>
         <button class="btn" id="download-sample-btn">Download Sample</button>
       </div>
-      <button class="btn" id="sample-load-btn">Try Sample List</button>
-      <button class="btn info-toggle" data-info="sample-info">?</button>
-      <div class="info-box" id="sample-info">Copy or download the sample to check the required table format before making your own list.</div>
+      <div class="action-with-tip">
+        <button class="btn" id="sample-load-btn">Try Sample List</button>
+        <button class="btn info-toggle" data-info="sample-info" aria-label="Sample list help">?</button>
+        <div class="info-box" id="sample-info">Copy or download the sample to check the required table format before making your own list.</div>
+      </div>
     </div>
   </section>
 
@@ -201,12 +212,30 @@ body.dark #qr-img{background:#fff;border-color:#334455}
     <div id="answer-actions">
       <button class="btn primary" id="answer-btn">Answer ▶</button>
     </div>
+    <div id="text-answer-wrap" style="display:none">
+      <div class="text-answer-actions">
+        <input id="text-answer-input" type="text" autocomplete="off" placeholder="Type your answer">
+        <button class="btn primary" id="check-answer-btn">Check</button>
+      </div>
+    </div>
     <div id="judge-actions" style="display:none">
       <div class="study-actions">
         <button class="btn" id="prev-task-btn">🔙</button>
         <button class="btn danger" id="ng-btn">Next×</button>
         <button class="btn success" id="ok-btn">Next○</button>
       </div>
+    </div>
+    <div id="machine-actions" style="display:none">
+      <p class="machine-feedback" id="machine-feedback"></p>
+      <div class="machine-actions machine-correct" id="machine-correct-actions">
+        <button class="btn success" id="machine-ok-btn">Next○</button>
+      </div>
+      <div class="machine-actions machine-wrong" id="machine-wrong-actions">
+        <button class="btn danger" id="machine-ng-btn">Next×</button>
+        <button class="btn success" id="accept-answer-btn">It'sOK○</button>
+        <button class="btn info-toggle machine-help" id="accept-help-btn" data-info="accept-help-info" aria-label="It's OK help">?</button>
+      </div>
+      <div class="info-box" id="accept-help-info">This is a mechanical exact-match check. If your answer is correct in context, press It'sOK○ to count it as correct.</div>
     </div>
     <div id="skip-actions" style="display:none">
       <button class="btn primary" id="skip-btn">Next →</button>
@@ -237,6 +266,7 @@ const SAMPLE_TSV = `Sample Flashcards\tTags\tTags\t熟語\t読み\t意味\t例�
 3\t2課\t復習\t顔を出す\tかおをだす\t少しだけ参加する\t時間があれば会議に顔を出します。`;
 let dataset = null;
 let selectedFields = [];
+let selectedTextFields = [];
 let selectedTags = [];
 let selectedCount = 1;
 let studyQueue = [];
@@ -254,6 +284,8 @@ let shareBackScreen = "s-setup";
 let shareSourceUrl = "";
 let currentScreen = "s-load";
 let resultDetailFilters = new Set();
+let compactShareSettings = null;
+let pendingMachineResult = null;
 
 const $ = id => document.getElementById(id);
 
@@ -508,7 +540,79 @@ function googleSheetCsvUrl(url){
 
 function googleSheetId(url){
   const match = String(url || "").match(/\/spreadsheets\/d\/([^/]+)/);
-  return match ? match[1] : "";
+  return match && match[1] !== "e" ? match[1] : "";
+}
+
+function googleSheetGid(url){
+  const match = String(url || "").match(/[?&#]gid=(\d+)/);
+  return match ? Number(match[1]) : 0;
+}
+
+function canonicalGoogleSheetUrl(id, gid=0){
+  return `https://docs.google.com/spreadsheets/d/${id}/edit${gid ? `#gid=${gid}` : ""}`;
+}
+
+function bytesToBase64Url(bytes){
+  let binary = "";
+  for(let i=0; i<bytes.length; i+=0x8000){
+    binary += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
+  }
+  return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
+}
+
+function base64UrlToBytes(value){
+  const base64 = String(value || "").replace(/-/g, "+").replace(/_/g, "/");
+  const padded = base64 + "=".repeat((4 - base64.length % 4) % 4);
+  const binary = atob(padded);
+  return Uint8Array.from(binary, char => char.charCodeAt(0));
+}
+
+function textToBase64Url(value){
+  return bytesToBase64Url(new TextEncoder().encode(String(value || "")));
+}
+
+function base64UrlToText(value){
+  return new TextDecoder().decode(base64UrlToBytes(value));
+}
+
+function encodeSelectionBitset(selected, source){
+  const bytes = new Uint8Array(Math.ceil(source.length / 8));
+  selected.forEach(value => {
+    const index = source.indexOf(value);
+    if(index >= 0) bytes[index >> 3] |= 1 << (index & 7);
+  });
+  return bytesToBase64Url(bytes);
+}
+
+function decodeSelectionBitset(value, source){
+  if(!value) return [];
+  const bytes = base64UrlToBytes(value);
+  return source.filter((_, index) => Boolean(bytes[index >> 3] & (1 << (index & 7))));
+}
+
+async function encodeEmbeddedData(text){
+  const raw = new TextEncoder().encode(text);
+  let best = "d" + bytesToBase64Url(raw);
+  if(typeof CompressionStream === "function"){
+    for(const [format, prefix] of [["deflate-raw", "r"], ["gzip", "z"]]){
+      try{
+        const stream = new Blob([raw]).stream().pipeThrough(new CompressionStream(format));
+        const compressed = new Uint8Array(await new Response(stream).arrayBuffer());
+        const candidate = prefix + bytesToBase64Url(compressed);
+        if(candidate.length < best.length) best = candidate;
+      }catch(e){}
+    }
+  }
+  return best;
+}
+
+async function decodeEmbeddedData(segment){
+  const bytes = base64UrlToBytes(segment.slice(1));
+  if(segment[0] === "d") return new TextDecoder().decode(bytes);
+  if(typeof DecompressionStream !== "function") throw new Error("This browser cannot open compressed shared data.");
+  const format = segment[0] === "r" ? "deflate-raw" : "gzip";
+  const stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream(format));
+  return new TextDecoder().decode(await new Response(stream).arrayBuffer());
 }
 
 function usageLogKey(url){
@@ -660,6 +764,7 @@ async function loadDatasetFromRows(rows, src="", listNameHint="Untitled", csvTex
   embeddedListName = embeddedCsv ? cleanListName(listNameHint) : "";
   logSourceLoadOnce(sourceUrl);
   selectedFields = restoreFieldSelection();
+  selectedTextFields = [];
   selectedTags = dataset.tags.slice();
   $("filter-mode").value = dataset.tags.length ? "tags" : "number";
   selectedCount = Math.min(15, dataset.items.length);
@@ -835,6 +940,18 @@ function renderFieldList(){
     const label = document.createElement("div");
     label.textContent = name;
     div.append(num, label);
+    if(idx > 0){
+      const textButton = document.createElement("button");
+      const enabled = selectedTextFields.includes(name);
+      textButton.className = "btn text-mode-toggle" + (enabled ? " active" : "");
+      textButton.textContent = "Text";
+      textButton.type = "button";
+      textButton.onclick = event => {
+        event.stopPropagation();
+        toggleTextField(name);
+      };
+      div.appendChild(textButton);
+    }
     div.onclick = () => toggleField(name);
     list.appendChild(div);
   });
@@ -842,9 +959,22 @@ function renderFieldList(){
 
 function toggleField(name){
   const idx = selectedFields.indexOf(name);
-  if(idx >= 0) selectedFields.splice(idx, 1);
+  if(idx >= 0){
+    selectedFields.splice(idx, 1);
+    selectedTextFields = selectedTextFields.filter(field => field !== name);
+  }
   else selectedFields.push(name);
+  selectedTextFields = selectedTextFields.filter(field => selectedFields.indexOf(field) > 0);
   saveFieldSelection();
+  renderFieldList();
+}
+
+function toggleTextField(name){
+  if(selectedFields.indexOf(name) <= 0) return;
+  const idx = selectedTextFields.indexOf(name);
+  if(idx >= 0) selectedTextFields.splice(idx, 1);
+  else selectedTextFields.push(name);
+  selectedTextFields.sort((a,b) => selectedFields.indexOf(a) - selectedFields.indexOf(b));
   renderFieldList();
 }
 
@@ -896,7 +1026,7 @@ function buildStudyQueue(items){
   items.forEach(item => {
     const targets = targetFields.map(field => {
       const answer = item.fields[field] || "";
-      return { field, answer, active: Boolean(answer) };
+      return { field, answer, active: Boolean(answer), textMode: selectedTextFields.includes(field) };
     }).filter(target => target.active);
     if(targets.length) queue.push({ item, baseField, targets });
   });
@@ -923,6 +1053,7 @@ function startStudy(itemsOverride=null){
   results = [];
   currentCardIndex = 0;
   currentAnswerIndex = -1;
+  pendingMachineResult = null;
   showingAnswer = false;
   showBaseCard();
   goTo("s-study");
@@ -940,6 +1071,42 @@ function currentCard(){
   return studyQueue[currentCardIndex];
 }
 
+function hideStudyActions(){
+  $("answer-actions").style.display = "none";
+  $("text-answer-wrap").style.display = "none";
+  $("judge-actions").style.display = "none";
+  $("machine-actions").style.display = "none";
+  $("skip-actions").style.display = "none";
+  $("accept-help-info").classList.remove("show");
+}
+
+function beginTarget(targetIndex){
+  const card = currentCard();
+  if(targetIndex >= card.targets.length){
+    advanceCard();
+    return;
+  }
+  if(card.targets[targetIndex].textMode) showTextPrompt(targetIndex);
+  else {
+    currentAnswerIndex = targetIndex - 1;
+    showAnswer();
+  }
+}
+
+function showTextPrompt(targetIndex){
+  const card = currentCard();
+  const target = card.targets[targetIndex];
+  currentAnswerIndex = targetIndex;
+  pendingMachineResult = null;
+  hideStudyActions();
+  $("text-answer-wrap").style.display = "block";
+  $("text-answer-input").value = "";
+  $("text-answer-input").placeholder = `Type ${target.field}`;
+  $("next-field").textContent = `Type → ${target.field}`;
+  showingAnswer = false;
+  setTimeout(() => $("text-answer-input").focus(), 0);
+}
+
 function showBaseCard(){
   const card = currentCard();
   const pct = Math.round((completedTaskCount() / totalActiveTasks()) * 100);
@@ -949,11 +1116,11 @@ function showBaseCard(){
   renderMarkedText($("card-main"), card.item.fields[card.baseField] || NONE_TEXT);
   $("card-sub").textContent = "Base";
   $("next-field").textContent = card.targets.length ? `Next → ${card.targets[0].field}` : "";
-  $("answer-actions").style.display = "block";
-  $("judge-actions").style.display = "none";
-  $("skip-actions").style.display = "none";
+  hideStudyActions();
   currentAnswerIndex = -1;
   showingAnswer = false;
+  if(card.targets[0] && card.targets[0].textMode) showTextPrompt(0);
+  else $("answer-actions").style.display = "block";
 }
 
 function showAnswer(){
@@ -970,9 +1137,8 @@ function showAnswer(){
   const baseValue = card.item.fields[card.baseField] || NONE_TEXT;
   renderMarkedText($("card-sub"), `${card.baseField}: ${baseValue}`);
   $("next-field").textContent = nextTarget ? `Next → ${nextTarget.field}` : "";
-  $("answer-actions").style.display = "none";
+  hideStudyActions();
   $("judge-actions").style.display = "block";
-  $("skip-actions").style.display = "none";
   $("prev-task-btn").disabled = false;
   showingAnswer = true;
 }
@@ -980,7 +1146,59 @@ function showAnswer(){
 function judge(ok){
   const card = currentCard();
   const target = card.targets[currentAnswerIndex];
-  results.push({ item: card.item, baseField: card.baseField, field: target.field, answer: target.answer, active: true, ok });
+  results.push({ item: card.item, baseField: card.baseField, field: target.field, answer: target.answer, active: true, ok, accepted: false, input: "" });
+  nextAnswerOrCard();
+}
+
+function normalizedAnswer(value){
+  return String(value || "")
+    .replace(/\r\n?/g, "\n")
+    .replace(/[（(]{2}/g, "")
+    .replace(/[）)]{2}/g, "")
+    .trim();
+}
+
+function checkTextAnswer(){
+  const card = currentCard();
+  const target = card.targets[currentAnswerIndex];
+  const input = $("text-answer-input").value;
+  const ok = normalizedAnswer(input) === normalizedAnswer(target.answer);
+  pendingMachineResult = { input, ok };
+  showMachineEvaluation(input, ok);
+}
+
+function showMachineEvaluation(input, ok){
+  const card = currentCard();
+  const target = card.targets[currentAnswerIndex];
+  const nextTarget = card.targets[currentAnswerIndex + 1];
+  $("card-label").textContent = `Answer ${currentAnswerIndex + 1}: ${target.field}`;
+  renderMarkedText($("card-main"), target.answer || NONE_TEXT);
+  renderMarkedText($("card-sub"), `Your answer: ${input || NONE_TEXT}`);
+  $("next-field").textContent = nextTarget ? `Next → ${nextTarget.field}` : "";
+  hideStudyActions();
+  $("machine-actions").style.display = "block";
+  $("machine-feedback").textContent = ok ? "Correct" : "Not an exact match";
+  $("machine-feedback").className = "machine-feedback " + (ok ? "ok" : "ng");
+  $("machine-correct-actions").style.display = ok ? "grid" : "none";
+  $("machine-wrong-actions").style.display = ok ? "none" : "grid";
+  showingAnswer = true;
+}
+
+function recordMachineResult(ok, accepted=false){
+  if(!pendingMachineResult) return;
+  const card = currentCard();
+  const target = card.targets[currentAnswerIndex];
+  results.push({
+    item: card.item,
+    baseField: card.baseField,
+    field: target.field,
+    answer: target.answer,
+    active: true,
+    ok,
+    accepted,
+    input: pendingMachineResult.input
+  });
+  pendingMachineResult = null;
   nextAnswerOrCard();
 }
 
@@ -999,11 +1217,18 @@ function showAnswerTask(result){
   $("prog-text").textContent = `Card ${currentCardIndex + 1} / ${studyQueue.length}  No.${card.item.number}`;
   $("card-label").textContent = `Answer ${currentAnswerIndex + 1}: ${target.field}`;
   renderMarkedText($("card-main"), target.answer || NONE_TEXT);
-  renderMarkedText($("card-sub"), `${card.baseField}: ${card.item.fields[card.baseField] || NONE_TEXT}`);
   $("next-field").textContent = nextTarget ? `Next → ${nextTarget.field}` : "";
-  $("answer-actions").style.display = "none";
+  if(target.textMode){
+    pendingMachineResult = {
+      input: result.input || "",
+      ok: Boolean(result.ok && !result.accepted)
+    };
+    showMachineEvaluation(pendingMachineResult.input, pendingMachineResult.ok);
+    return;
+  }
+  renderMarkedText($("card-sub"), `${card.baseField}: ${card.item.fields[card.baseField] || NONE_TEXT}`);
+  hideStudyActions();
   $("judge-actions").style.display = "block";
-  $("skip-actions").style.display = "none";
   $("prev-task-btn").disabled = false;
   showingAnswer = true;
 }
@@ -1024,7 +1249,7 @@ function skipTask(){
 
 function nextAnswerOrCard(){
   const card = currentCard();
-  if(currentAnswerIndex + 1 < card.targets.length) showAnswer();
+  if(currentAnswerIndex + 1 < card.targets.length) beginTarget(currentAnswerIndex + 1);
   else advanceCard();
 }
 
@@ -1084,8 +1309,14 @@ function renderResultList(list, filters=resultDetailFilters){
     sub.className = "result-sub";
     renderMarkedText(sub, r.answer || NONE_TEXT);
     left.append(main, sub);
+    if(r.input){
+      const input = document.createElement("div");
+      input.className = "result-input";
+      input.textContent = `Your answer: ${r.input}`;
+      left.appendChild(input);
+    }
     const badge = document.createElement("div");
-    badge.className = "badge " + (r.ok ? "ok" : "ng");
+    badge.className = "badge " + (r.accepted ? "accepted" : r.ok ? "ok" : "ng");
     badge.textContent = r.ok ? "○" : "✗";
     row.append(left, badge);
     wrap.appendChild(row);
@@ -1130,7 +1361,7 @@ function retryWrong(){
   studyQueue = results.filter(r => !r.ok).map(r => ({
     item: r.item,
     baseField: r.baseField,
-    targets: [{ field: r.field, answer: r.answer, active: true }]
+    targets: [{ field: r.field, answer: r.answer, active: true, textMode: selectedTextFields.includes(r.field) }]
   }));
   results = [];
   currentCardIndex = 0;
@@ -1160,35 +1391,52 @@ function updateNextCardsButton(){
   $("next-cards-btn").disabled = remaining === 0;
 }
 
-function buildShareUrl(){
+function compactSourceSegment(url, library=false){
+  const id = googleSheetId(url);
+  if(id) return { segment: (library ? "l" : "s") + id, gid: googleSheetGid(url) };
+  return { segment: (library ? "v" : "u") + textToBase64Url(url), gid: 0 };
+}
+
+async function buildShareUrl(){
   if(!sourceUrl && !embeddedCsv) return "";
-  const params = new URLSearchParams();
-  if(sourceUrl) params.set("src", sourceUrl);
-  else {
-    params.set("data", embeddedCsv);
-    params.set("name", embeddedListName || "List2Card List");
+  const segments = ["1"];
+  if(sourceUrl){
+    const source = compactSourceSegment(sourceUrl);
+    segments.push(source.segment);
+    if(source.gid) segments.push("g" + source.gid.toString(36));
+  }else{
+    segments.push(await encodeEmbeddedData(embeddedCsv));
   }
-  params.set("f", selectedFields.map(field => dataset.fieldNames.indexOf(field).toString(36)).join(","));
+
+  segments.push("f" + encodeSelectionBitset(selectedFields, dataset.fieldNames));
+  if(selectedTextFields.length) segments.push("e" + encodeSelectionBitset(selectedTextFields, dataset.fieldNames));
   const mode = currentFilterMode();
-  params.set("m", mode === "tags" ? "t" : "n");
   if(mode === "tags" && selectedTags.length !== dataset.tags.length){
-    params.set("t", selectedTags.map(tag => dataset.tags.indexOf(tag).toString(36)).join(","));
+    segments.push("t" + encodeSelectionBitset(selectedTags, dataset.tags));
   }
-  params.set("s", $("min-no").value);
-  params.set("c", String(selectedCount));
-  params.set("o", $("order-select").value === "random" ? "r" : "n");
-  return location.origin + location.pathname + "?" + params.toString();
+  let flags = 0;
+  if(mode === "number") flags |= 1;
+  if($("order-select").value === "number") flags |= 2;
+  if(flags) segments.push("x" + flags.toString(36));
+
+  const firstNumber = dataset.items.length ? dataset.items[0].number : 0;
+  const startNumber = Number($("min-no").value);
+  if(mode === "number" && startNumber !== firstNumber) segments.push("n" + startNumber.toString(36));
+  const defaultCount = Math.max(1, Math.min(15, filteredItems().length || 1));
+  if(selectedCount !== defaultCount) segments.push("c" + selectedCount.toString(36));
+  return location.origin + location.pathname + "?q=" + segments.join("~");
 }
 
-function buildIndexShareUrl(){
+async function buildIndexShareUrl(){
   if(!indexSourceUrl) return "";
-  const params = new URLSearchParams();
-  params.set("src", indexSourceUrl);
-  return location.origin + location.pathname + "?" + params.toString();
+  const source = compactSourceSegment(indexSourceUrl, true);
+  const segments = ["1", source.segment];
+  if(source.gid) segments.push("g" + source.gid.toString(36));
+  return location.origin + location.pathname + "?q=" + segments.join("~");
 }
 
-function showShare(){
-  const url = buildShareUrl();
+async function showShare(){
+  const url = await buildShareUrl();
   if(!url){
     setNotice("setup-notice", "Share URL is available when loaded from a spreadsheet link or an embedded CSV URL.");
     goTo("s-setup");
@@ -1203,8 +1451,8 @@ function showShare(){
   goTo("s-share");
 }
 
-function showIndexShare(){
-  const url = buildIndexShareUrl();
+async function showIndexShare(){
+  const url = await buildIndexShareUrl();
   if(!url){
     setNotice("index-notice", "Share URL is available when this library was loaded from a spreadsheet link.");
     return;
@@ -1280,6 +1528,46 @@ function renderSourceLink(containerId, boxId){
   box.textContent = sourceUrl;
 }
 
+async function decodeCompactShare(value){
+  const segments = String(value || "").split("~").filter(Boolean);
+  if(segments.shift() !== "1") throw new Error("Unsupported shared URL version.");
+  const decoded = { kind: "", url: "", csv: "", settings: {} };
+  let gid = 0;
+
+  for(const segment of segments){
+    const key = segment[0];
+    const data = segment.slice(1);
+    if(key === "s" || key === "l"){
+      decoded.kind = key === "l" ? "library" : "sheet";
+      decoded.sheetId = data;
+    }else if(key === "u" || key === "v"){
+      decoded.kind = key === "v" ? "library" : "sheet";
+      decoded.url = base64UrlToText(data);
+    }else if(key === "d" || key === "r" || key === "z"){
+      decoded.kind = "data";
+      decoded.csv = await decodeEmbeddedData(segment);
+    }else if(key === "g"){
+      gid = parseInt(data, 36) || 0;
+    }else if(key === "f"){
+      decoded.settings.fields = data;
+    }else if(key === "e"){
+      decoded.settings.textFields = data;
+    }else if(key === "t"){
+      decoded.settings.tags = data;
+    }else if(key === "x"){
+      decoded.settings.flags = parseInt(data, 36) || 0;
+    }else if(key === "n"){
+      decoded.settings.start = parseInt(data, 36);
+    }else if(key === "c"){
+      decoded.settings.count = parseInt(data, 36);
+    }
+  }
+
+  if(decoded.sheetId) decoded.url = canonicalGoogleSheetUrl(decoded.sheetId, gid);
+  if(!decoded.kind || (!decoded.url && !decoded.csv)) throw new Error("Shared URL data is incomplete.");
+  return decoded;
+}
+
 function parseIndexParam(value, source){
   if(!value) return [];
   return String(value).split(",")
@@ -1289,6 +1577,33 @@ function parseIndexParam(value, source){
 }
 
 function applyQuerySettings(){
+  if(compactShareSettings){
+    const settings = compactShareSettings;
+    const fields = decodeSelectionBitset(settings.fields, dataset.fieldNames);
+    if(fields.length >= 2){
+      selectedFields = fields;
+      saveFieldSelection();
+    }
+    selectedTextFields = decodeSelectionBitset(settings.textFields, dataset.fieldNames)
+      .filter(field => selectedFields.indexOf(field) > 0);
+    renderFieldList();
+    if(settings.tags != null){
+      selectedTags = decodeSelectionBitset(settings.tags, dataset.tags);
+      renderTagList();
+    }
+    const flags = settings.flags || 0;
+    $("filter-mode").value = flags & 1 ? "number" : (dataset.tags.length ? "tags" : "number");
+    updateFilterMode();
+    if(Number.isFinite(settings.start)){
+      $("min-no").value = settings.start;
+      syncSlidersFromNoInputs();
+    }
+    setOrder(flags & 2 ? "number" : "random");
+    if(Number.isFinite(settings.count)) setCount(settings.count);
+    compactShareSettings = null;
+    return;
+  }
+
   const params = new URLSearchParams(location.search);
   const fields = parseIndexParam(params.get("f"), dataset.fieldNames);
   if(fields.length >= 2){
@@ -1317,6 +1632,27 @@ function applyQuerySettings(){
 
 async function initFromQuery(){
   const params = new URLSearchParams(location.search);
+  const compact = params.get("q");
+  if(compact){
+    try{
+      const decoded = await decodeCompactShare(compact);
+      compactShareSettings = decoded.kind === "library" ? null : decoded.settings;
+      setNotice("load-notice", "Loading shared List2Card URL.", "info");
+      if(decoded.kind === "data"){
+        await loadDatasetFromRows(parseCsv(decoded.csv), "", "Shared List", decoded.csv);
+      }else{
+        $("sheet-url").value = decoded.url;
+        await loadFromSheetUrl(decoded.url);
+      }
+      setNotice("load-notice", "");
+    }catch(err){
+      compactShareSettings = null;
+      setNotice("load-notice", err.message || "Shared URL could not be opened.");
+    }
+    return;
+  }
+
+  // Legacy shared URLs remain readable.
   const src = params.get("src");
   const csvData = params.get("data");
   if(csvData){
@@ -1454,6 +1790,10 @@ $("share-source-btn").onclick = openShareSource;
 $("copy-share-btn").onclick = copyShareUrl;
 $("share-back-btn").onclick = () => goTo(shareBackScreen);
 $("answer-btn").onclick = showAnswer;
+$("check-answer-btn").onclick = checkTextAnswer;
+$("machine-ok-btn").onclick = () => recordMachineResult(true);
+$("machine-ng-btn").onclick = () => recordMachineResult(false);
+$("accept-answer-btn").onclick = () => recordMachineResult(true, true);
 $("ok-btn").onclick = () => judge(true);
 $("ng-btn").onclick = () => judge(false);
 $("prev-task-btn").onclick = previousTask;
@@ -1464,8 +1804,18 @@ $("next-cards-btn").onclick = nextCards;
 $("result-setup-btn").onclick = () => goTo("s-setup");
 
 document.querySelectorAll(".info-toggle").forEach(button => {
-  button.onclick = () => $(button.dataset.info).classList.toggle("show");
+  button.onclick = () => {
+    const info = $(button.dataset.info);
+    if(info) info.classList.toggle("show");
+  };
 });
+
+$("text-answer-input").onkeydown = event => {
+  if(event.key === "Enter"){
+    event.preventDefault();
+    checkTextAnswer();
+  }
+};
 
 document.addEventListener("keydown", event => {
   if(["INPUT", "SELECT", "TEXTAREA"].includes(document.activeElement.tagName)) return;
